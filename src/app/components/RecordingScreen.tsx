@@ -7,7 +7,6 @@ interface RecordingScreenProps {
   selectedModel?: string | null;
   selectedTopic?: Topic | null;
   onViewModelIntro?: (modelId: string) => void;
-  onGoBack: () => void;
 }
 
 const modelNames: Record<string, string> = {
@@ -16,7 +15,7 @@ const modelNames: Record<string, string> = {
   scqa: 'SCQA法'
 };
 
-export default function RecordingScreen({ onNavigate, selectedModel, selectedTopic, onViewModelIntro, onGoBack }: RecordingScreenProps) {
+export default function RecordingScreen({ onNavigate, selectedModel, selectedTopic, onViewModelIntro }: RecordingScreenProps) {
   const [showModelTooltip, setShowModelTooltip] = useState(false);
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
 
@@ -98,7 +97,7 @@ export default function RecordingScreen({ onNavigate, selectedModel, selectedTop
       {/* Header */}
       <div className="px-6 pt-12 pb-6">
         <button
-          onClick={onGoBack}
+          onClick={() => onNavigate('topicDetail')}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />

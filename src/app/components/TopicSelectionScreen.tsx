@@ -4,7 +4,6 @@ import { useState } from 'react';
 interface TopicSelectionScreenProps {
   onNavigate: (screen: string) => void;
   onSelectTopic?: (topic: Topic) => void;
-  onGoBack: () => void;
 }
 
 export interface Topic {
@@ -95,7 +94,7 @@ const topics: Topic[] = [
   }
 ];
 
-export default function TopicSelectionScreen({ onNavigate, onSelectTopic, onGoBack }: TopicSelectionScreenProps) {
+export default function TopicSelectionScreen({ onNavigate, onSelectTopic }: TopicSelectionScreenProps) {
   const [selectedLevel, setSelectedLevel] = useState('初級');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -119,7 +118,7 @@ export default function TopicSelectionScreen({ onNavigate, onSelectTopic, onGoBa
       {/* Header */}
       <div className="px-6 pt-12 pb-4 sticky top-0 bg-white z-10 border-b border-gray-100">
         <button
-          onClick={onGoBack}
+          onClick={() => onNavigate('home')}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />

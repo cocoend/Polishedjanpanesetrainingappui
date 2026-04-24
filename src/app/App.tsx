@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import HomeScreen from './components/HomeScreen';
 import TopicSelectionScreen, { Topic } from './components/TopicSelectionScreen';
 import ModelListScreen from './components/ModelListScreen';
@@ -11,75 +11,73 @@ import LearnedBoxScreen from './components/LearnedBoxScreen';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('home');
-  const [screenHistory, setScreenHistory] = useState<string[]>(['home']);
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
   const [modelIntroId, setModelIntroId] = useState<string>('prep');
+  const [previousScreen, setPreviousScreen] = useState<string>('home');
+  const [modelListOrigin, setModelListOrigin] = useState<string>('home');
 
-  const navigateTo = useCallback((screen: string) => {
-    setScreenHistory(prev => [...prev, screen]);
-    setCurrentScreen(screen);
-  }, []);
+  const navigateToScreen = (newScreen: string) => {
+    setPreviousScreen(currentScreen);
 
-  const goBack = useCallback(() => {
-    setScreenHistory(prev => {
-      if (prev.length > 1) {
-        const newHistory = prev.slice(0, -1);
-        setCurrentScreen(newHistory[newHistory.length - 1]);
-        return newHistory;
-      }
-      return prev;
-    });
-  }, []);
+    // モデル選択画面に遷移する時、起点を記録（モデル詳細から戻る場合を除く）
+    if (newScreen === 'modelList' && currentScreen !== 'modelIntro') {
+      setModelListOrigin(currentScreen);
+    }
+
+    setCurrentScreen(newScreen);
+  };
 
   return (
     <div className="size-full bg-white overflow-auto">
       <div className="max-w-md mx-auto">
-        {currentScreen === 'home' && <HomeScreen onNavigate={navigateTo} onGoBack={goBack} />}
+        {currentScreen === 'home' && <HomeScreen onNavigate={navigateToScreen} />}
         {currentScreen === 'topic' && (
-          <TopicSelectionScreen onNavigate={navigateTo} onSelectTopic={setSelectedTopic} onGoBack={goBack} />
+          <TopicSelectionScreen onNavigate={navigateToScreen} onSelectTopic={setSelectedTopic} />
         )}
         {currentScreen === 'modelList' && (
           <ModelListScreen
-            onNavigate={navigateTo}
+            onNavigate={navigateToScreen}
+            originScreen={modelListOrigin}
             onSelectModel={setSelectedModel}
             onViewIntro={(id) => {
               setModelIntroId(id);
-              navigateTo('modelIntro');
+              navigateToScreen('modelIntro');
             }}
-            onGoBack={goBack}
           />
         )}
         {currentScreen === 'modelIntro' && (
-          <ModelIntroScreen onNavigate={navigateTo} modelId={modelIntroId} onGoBack={goBack} />
+          <ModelIntroScreen
+            onNavigate={navigateToScreen}
+            previousScreen={previousScreen}
+            modelId={modelIntroId}
+          />
         )}
         {currentScreen === 'topicDetail' && (
           <TopicDetailScreen
-            onNavigate={navigateTo}
+            onNavigate={navigateToScreen}
             selectedModel={selectedModel}
             selectedTopic={selectedTopic}
             onViewModelIntro={(id) => {
               setModelIntroId(id);
-              navigateTo('modelIntro');
+              navigateToScreen('modelIntro');
             }}
-            onGoBack={goBack}
           />
         )}
         {currentScreen === 'recording' && (
           <RecordingScreen
-            onNavigate={navigateTo}
+            onNavigate={navigateToScreen}
             selectedModel={selectedModel}
             selectedTopic={selectedTopic}
             onViewModelIntro={(id) => {
               setModelIntroId(id);
-              navigateTo('modelIntro');
+              navigateToScreen('modelIntro');
             }}
-            onGoBack={goBack}
           />
         )}
-        {currentScreen === 'feedback' && <FeedbackScreen onNavigate={navigateTo} onGoBack={goBack} />}
-        {currentScreen === 'retry' && <RetryScreen onNavigate={navigateTo} onGoBack={goBack} />}
-        {currentScreen === 'learnedBox' && <LearnedBoxScreen onNavigate={navigateTo} onGoBack={goBack} />}
+        {currentScreen === 'feedback' && <FeedbackScreen onNavigate={navigateToScreen} />}
+        {currentScreen === 'retry' && <RetryScreen onNavigate={navigateToScreen} />}
+        {currentScreen === 'learnedBox' && <LearnedBoxScreen onNavigate={navigateToScreen} />}
       </div>
     </div>
   );

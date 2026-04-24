@@ -2,8 +2,8 @@ import { ArrowLeft, CheckCircle2, ListOrdered, Lightbulb } from 'lucide-react';
 
 interface ModelIntroScreenProps {
   onNavigate: (screen: string) => void;
+  previousScreen?: string;
   modelId: string;
-  onGoBack: () => void;
 }
 
 const modelIntros: Record<string, any> = {
@@ -194,7 +194,7 @@ const modelIntros: Record<string, any> = {
   }
 };
 
-export default function ModelIntroScreen({ onNavigate, modelId, onGoBack }: ModelIntroScreenProps) {
+export default function ModelIntroScreen({ onNavigate, previousScreen, modelId }: ModelIntroScreenProps) {
   const intro = modelIntros[modelId] || modelIntros.prep;
   const Icon = intro.icon;
 
@@ -203,7 +203,7 @@ export default function ModelIntroScreen({ onNavigate, modelId, onGoBack }: Mode
       {/* Header */}
       <div className="px-6 pt-12 pb-6 sticky top-0 bg-white z-10 border-b border-gray-100">
         <button
-          onClick={onGoBack}
+          onClick={() => onNavigate(previousScreen || 'modelList')}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -294,10 +294,10 @@ export default function ModelIntroScreen({ onNavigate, modelId, onGoBack }: Mode
       {/* CTA */}
       <div className="px-6 sticky bottom-0 bg-white pt-4 pb-6 border-t border-gray-100">
         <button
-          onClick={() => onNavigate('modelList')}
+          onClick={() => onNavigate(previousScreen === 'modelList' ? 'modelList' : (previousScreen || 'modelList'))}
           className={`w-full bg-gradient-to-r ${intro.color} text-white font-bold py-5 rounded-2xl shadow-lg`}
         >
-          説明モデル一覧に戻る
+          {previousScreen === 'modelList' ? '説明モデル一覧に戻る' : '戻る'}
         </button>
       </div>
     </div>

@@ -3,9 +3,9 @@ import { useState } from 'react';
 
 interface ModelListScreenProps {
   onNavigate: (screen: string) => void;
+  originScreen?: string;
   onSelectModel?: (modelId: string) => void;
   onViewIntro?: (modelId: string) => void;
-  onGoBack: () => void;
 }
 
 const models = [
@@ -86,7 +86,7 @@ const models = [
   }
 ];
 
-export default function ModelListScreen({ onNavigate, onSelectModel, onViewIntro, onGoBack }: ModelListScreenProps) {
+export default function ModelListScreen({ onNavigate, originScreen, onSelectModel, onViewIntro }: ModelListScreenProps) {
   const [hoveredModel, setHoveredModel] = useState<string | null>(null);
   const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
 
@@ -130,7 +130,7 @@ export default function ModelListScreen({ onNavigate, onSelectModel, onViewIntro
       {/* Header */}
       <div className="px-6 pt-12 pb-6">
         <button
-          onClick={onGoBack}
+          onClick={() => onNavigate(originScreen || 'home')}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />

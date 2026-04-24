@@ -2,16 +2,15 @@ import { ArrowLeft, Target, Lightbulb, Mic, BookOpen, Sparkles } from 'lucide-re
 
 interface RetryScreenProps {
   onNavigate: (screen: string) => void;
-  onGoBack: () => void;
 }
 
-export default function RetryScreen({ onNavigate, onGoBack }: RetryScreenProps) {
+export default function RetryScreen({ onNavigate }: RetryScreenProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-green-50 pb-8">
       {/* Header */}
       <div className="px-6 pt-12 pb-6">
         <button
-          onClick={onGoBack}
+          onClick={() => onNavigate('feedback')}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />
