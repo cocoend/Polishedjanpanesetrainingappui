@@ -7,7 +7,6 @@ interface TopicDetailScreenProps {
   selectedModel?: string | null;
   selectedTopic?: Topic | null;
   onViewModelIntro?: (modelId: string) => void;
-  onGoBack: () => void;
 }
 
 const modelData: Record<string, {
@@ -40,7 +39,7 @@ const modelData: Record<string, {
   }
 };
 
-export default function TopicDetailScreen({ onNavigate, selectedModel, selectedTopic, onViewModelIntro, onGoBack }: TopicDetailScreenProps) {
+export default function TopicDetailScreen({ onNavigate, selectedModel, selectedTopic, onViewModelIntro }: TopicDetailScreenProps) {
   // デフォルト主題
   const defaultTopic: Topic = {
     id: 0,
@@ -97,7 +96,7 @@ export default function TopicDetailScreen({ onNavigate, selectedModel, selectedT
       {/* Header */}
       <div className="px-6 pt-12 pb-6 sticky top-0 bg-white z-10 border-b border-gray-100">
         <button
-          onClick={onGoBack}
+          onClick={() => onNavigate('topic')}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -181,9 +180,7 @@ export default function TopicDetailScreen({ onNavigate, selectedModel, selectedT
           <button
             onClick={() => onNavigate('modelList')}
             className="w-full bg-white border border-gray-300 hover:border-gray-400 text-gray-700 font-medium py-2.5 rounded-xl transition-colors text-sm"
-          >
-            モデルを変更する
-          </button>
+          >ほかのモデルを見る</button>
         </div>
       </div>
 

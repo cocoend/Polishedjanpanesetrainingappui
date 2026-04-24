@@ -2,7 +2,6 @@ import { Flame, Star, Play, BookOpen, TrendingUp, Archive } from 'lucide-react';
 
 interface HomeScreenProps {
   onNavigate: (screen: string) => void;
-  onGoBack: () => void;
 }
 
 export default function HomeScreen({ onNavigate }: HomeScreenProps) {

@@ -3,10 +3,9 @@ import { useState } from 'react';
 
 interface FeedbackScreenProps {
   onNavigate: (screen: string) => void;
-  onGoBack: () => void;
 }
 
-export default function FeedbackScreen({ onNavigate, onGoBack }: FeedbackScreenProps) {
+export default function FeedbackScreen({ onNavigate }: FeedbackScreenProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const toggleSection = (section: string) => {
@@ -18,7 +17,7 @@ export default function FeedbackScreen({ onNavigate, onGoBack }: FeedbackScreenP
       {/* Header */}
       <div className="px-6 pt-12 pb-6 sticky top-0 bg-white z-10 border-b border-gray-100">
         <button
-          onClick={onGoBack}
+          onClick={() => onNavigate('recording')}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />

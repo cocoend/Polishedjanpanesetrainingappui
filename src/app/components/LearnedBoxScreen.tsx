@@ -3,7 +3,6 @@ import { useState } from 'react';
 
 interface LearnedBoxScreenProps {
   onNavigate: (screen: string) => void;
-  onGoBack: () => void;
 }
 
 interface LearnedRecord {
@@ -70,7 +69,7 @@ const learnedRecords: LearnedRecord[] = [
   }
 ];
 
-export default function LearnedBoxScreen({ onNavigate, onGoBack }: LearnedBoxScreenProps) {
+export default function LearnedBoxScreen({ onNavigate }: LearnedBoxScreenProps) {
   const [filter, setFilter] = useState<'all' | 'recent' | 'high'>('all');
 
   const totalRecords = learnedRecords.length;
@@ -82,7 +81,7 @@ export default function LearnedBoxScreen({ onNavigate, onGoBack }: LearnedBoxScr
       {/* Header */}
       <div className="px-6 pt-12 pb-6 sticky top-0 bg-white z-10 border-b border-gray-100">
         <button
-          onClick={onGoBack}
+          onClick={() => onNavigate('home')}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />
