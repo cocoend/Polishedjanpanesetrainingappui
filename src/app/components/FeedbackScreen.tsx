@@ -3,9 +3,10 @@ import { useState } from 'react';
 
 interface FeedbackScreenProps {
   onNavigate: (screen: string) => void;
+  onGoBack: () => void;
 }
 
-export default function FeedbackScreen({ onNavigate }: FeedbackScreenProps) {
+export default function FeedbackScreen({ onNavigate, onGoBack }: FeedbackScreenProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const toggleSection = (section: string) => {
@@ -17,11 +18,11 @@ export default function FeedbackScreen({ onNavigate }: FeedbackScreenProps) {
       {/* Header */}
       <div className="px-6 pt-12 pb-6 sticky top-0 bg-white z-10 border-b border-gray-100">
         <button
-          onClick={() => onNavigate('home')}
+          onClick={onGoBack}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="font-medium">ホームに戻る</span>
+          <span className="font-medium">戻る</span>
         </button>
         <h1 className="text-2xl font-bold text-gray-900 mb-1">AIフィードバック</h1>
         <p className="text-gray-600 text-sm">あなたの説明を分析しました</p>
@@ -264,10 +265,16 @@ export default function FeedbackScreen({ onNavigate }: FeedbackScreenProps) {
           改善してもう一度挑戦
         </button>
         <button
+          onClick={() => onNavigate('learnedBox')}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-md flex items-center justify-center gap-3 transition-colors"
+        >
+          結果を保存して学んだBOXへ
+        </button>
+        <button
           onClick={() => onNavigate('home')}
           className="w-full text-gray-600 font-semibold py-3 hover:text-gray-900"
         >
-          結果を保存してホームへ
+          ホームに戻る
         </button>
       </div>
     </div>

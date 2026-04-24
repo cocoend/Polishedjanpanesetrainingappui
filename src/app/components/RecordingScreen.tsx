@@ -1,4 +1,4 @@
-import { ArrowLeft, Mic, Square, RotateCcw, Send, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowLeft, Mic, Square, RotateCcw, Send, BookOpen, Sparkles, HelpCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Topic } from './TopicSelectionScreen';
 
@@ -6,6 +6,8 @@ interface RecordingScreenProps {
   onNavigate: (screen: string) => void;
   selectedModel?: string | null;
   selectedTopic?: Topic | null;
+  onViewModelIntro?: (modelId: string) => void;
+  onGoBack: () => void;
 }
 
 const modelNames: Record<string, string> = {
@@ -14,7 +16,10 @@ const modelNames: Record<string, string> = {
   scqa: 'SCQA法'
 };
 
-export default function RecordingScreen({ onNavigate, selectedModel, selectedTopic }: RecordingScreenProps) {
+export default function RecordingScreen({ onNavigate, selectedModel, selectedTopic, onViewModelIntro, onGoBack }: RecordingScreenProps) {
+  const [showModelTooltip, setShowModelTooltip] = useState(false);
+  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+
   const defaultTopic: Topic = {
     id: 0,
     level: '初級',
@@ -30,6 +35,34 @@ export default function RecordingScreen({ onNavigate, selectedModel, selectedTop
 
   const topic = selectedTopic || defaultTopic;
   const currentModelName = selectedModel ? modelNames[selectedModel] || 'ステップ解説法' : 'ステップ解説法';
+
+  const handleHelpPress = () => {
+    const timer = setTimeout(() => {
+      setShowModelTooltip(true);
+    }, 500);
+    setPressTimer(timer);
+  };
+
+  const handleHelpRelease = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+    setShowModelTooltip(false);
+  };
+
+  const handleHelpClick = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+    if (showModelTooltip) {
+      setShowModelTooltip(false);
+    }
+    if (onViewModelIntro) {
+      onViewModelIntro(selectedModel || 'stepbystep');
+    }
+  };
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [transcript, setTranscript] = useState('');
@@ -65,7 +98,7 @@ export default function RecordingScreen({ onNavigate, selectedModel, selectedTop
       {/* Header */}
       <div className="px-6 pt-12 pb-6">
         <button
-          onClick={() => onNavigate('topicDetail')}
+          onClick={onGoBack}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -83,18 +116,36 @@ export default function RecordingScreen({ onNavigate, selectedModel, selectedTop
 
       {/* Model Reference Card */}
       <div className="px-6 pb-6">
-        <button
-          onClick={() => onNavigate('modelList')}
-          className="w-full bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 hover:bg-blue-100 transition-colors"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <BookOpen className="w-5 h-5 text-blue-600" />
-              <span className="font-bold text-gray-900 text-sm">説明モデルを確認</span>
+        <div className="relative bg-blue-50 border-2 border-blue-200 rounded-2xl p-4">
+          {/* Help Button */}
+          <button
+            onClick={handleHelpClick}
+            onMouseDown={handleHelpPress}
+            onMouseUp={handleHelpRelease}
+            onMouseLeave={handleHelpRelease}
+            onTouchStart={handleHelpPress}
+            onTouchEnd={handleHelpRelease}
+            className="absolute top-3 right-3 bg-white hover:bg-gray-50 rounded-full p-1.5 shadow-md border border-gray-200 transition-colors"
+          >
+            <HelpCircle className="w-4 h-4 text-gray-600" />
+
+            {/* Tooltip */}
+            {showModelTooltip && (
+              <div className="absolute top-full right-0 mt-2 bg-gray-900 text-white text-xs font-medium py-2 px-3 rounded-lg whitespace-nowrap z-10 shadow-xl">
+                {currentModelName}とは？
+                <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+              </div>
+            )}
+          </button>
+
+          <div className="flex items-center gap-3 pr-8">
+            <BookOpen className="w-5 h-5 text-blue-600" />
+            <div className="text-left">
+              <span className="font-bold text-gray-900 text-sm block">{currentModelName}</span>
+              <span className="text-xs text-gray-600">説明モデルを参考に話そう</span>
             </div>
-            <span className="text-blue-600 text-sm">開く →</span>
           </div>
-        </button>
+        </div>
       </div>
 
       {/* Main Recording Area */}

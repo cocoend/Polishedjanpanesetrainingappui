@@ -1,8 +1,11 @@
-import { ArrowLeft, ArrowRight, CheckCircle2, ListOrdered, MessageSquare, Lightbulb } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, ListOrdered, MessageSquare, Lightbulb, HelpCircle } from 'lucide-react';
+import { useState } from 'react';
 
 interface ModelListScreenProps {
   onNavigate: (screen: string) => void;
   onSelectModel?: (modelId: string) => void;
+  onViewIntro?: (modelId: string) => void;
+  onGoBack: () => void;
 }
 
 const models = [
@@ -83,7 +86,10 @@ const models = [
   }
 ];
 
-export default function ModelListScreen({ onNavigate, onSelectModel }: ModelListScreenProps) {
+export default function ModelListScreen({ onNavigate, onSelectModel, onViewIntro, onGoBack }: ModelListScreenProps) {
+  const [hoveredModel, setHoveredModel] = useState<string | null>(null);
+  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+
   const handleSelectModel = (modelId: string) => {
     if (onSelectModel) {
       onSelectModel(modelId);
@@ -91,12 +97,40 @@ export default function ModelListScreen({ onNavigate, onSelectModel }: ModelList
     onNavigate('topicDetail');
   };
 
+  const handleHelpPress = (modelId: string) => {
+    const timer = setTimeout(() => {
+      setHoveredModel(modelId);
+    }, 500);
+    setPressTimer(timer);
+  };
+
+  const handleHelpRelease = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+    setHoveredModel(null);
+  };
+
+  const handleHelpClick = (modelId: string) => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+    if (hoveredModel === modelId) {
+      setHoveredModel(null);
+    }
+    if (onViewIntro) {
+      onViewIntro(modelId);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white pb-8">
       {/* Header */}
       <div className="px-6 pt-12 pb-6">
         <button
-          onClick={() => onNavigate('topic')}
+          onClick={onGoBack}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -128,10 +162,33 @@ export default function ModelListScreen({ onNavigate, onSelectModel }: ModelList
           return (
             <div
               key={model.id}
-              className={`${model.bgColor} rounded-3xl p-6 border-2 ${model.borderColor} shadow-md`}
+              className={`${model.bgColor} rounded-3xl p-6 border-2 ${model.borderColor} shadow-md relative`}
             >
+              {/* Help Button */}
+              <div className="absolute top-4 right-4">
+                <button
+                  onClick={() => handleHelpClick(model.id)}
+                  onMouseDown={() => handleHelpPress(model.id)}
+                  onMouseUp={handleHelpRelease}
+                  onMouseLeave={handleHelpRelease}
+                  onTouchStart={() => handleHelpPress(model.id)}
+                  onTouchEnd={handleHelpRelease}
+                  className="relative bg-white hover:bg-gray-50 rounded-full p-2 shadow-md border border-gray-200 transition-colors"
+                >
+                  <HelpCircle className="w-5 h-5 text-gray-600" />
+
+                  {/* Tooltip */}
+                  {hoveredModel === model.id && (
+                    <div className="absolute top-full right-0 mt-2 bg-gray-900 text-white text-xs font-medium py-2 px-3 rounded-lg whitespace-nowrap z-10 shadow-xl">
+                      {model.name}とは？
+                      <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+                    </div>
+                  )}
+                </button>
+              </div>
+
               {/* Header */}
-              <div className="flex items-start gap-4 mb-4">
+              <div className="flex items-start gap-4 mb-4 pr-8">
                 <div className={`${model.iconBg} w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0`}>
                   <Icon className={`w-7 h-7 ${model.iconColor}`} />
                 </div>

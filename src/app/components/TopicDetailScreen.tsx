@@ -1,10 +1,13 @@
-import { ArrowLeft, Target, Lightbulb, MessageSquare, BookOpen, Mic, CheckCircle2, ListOrdered } from 'lucide-react';
+import { ArrowLeft, Target, Lightbulb, MessageSquare, BookOpen, Mic, CheckCircle2, ListOrdered, HelpCircle } from 'lucide-react';
 import { Topic } from './TopicSelectionScreen';
+import { useState } from 'react';
 
 interface TopicDetailScreenProps {
   onNavigate: (screen: string) => void;
   selectedModel?: string | null;
   selectedTopic?: Topic | null;
+  onViewModelIntro?: (modelId: string) => void;
+  onGoBack: () => void;
 }
 
 const modelData: Record<string, {
@@ -37,7 +40,7 @@ const modelData: Record<string, {
   }
 };
 
-export default function TopicDetailScreen({ onNavigate, selectedModel, selectedTopic }: TopicDetailScreenProps) {
+export default function TopicDetailScreen({ onNavigate, selectedModel, selectedTopic, onViewModelIntro, onGoBack }: TopicDetailScreenProps) {
   // デフォルト主題
   const defaultTopic: Topic = {
     id: 0,
@@ -58,12 +61,43 @@ export default function TopicDetailScreen({ onNavigate, selectedModel, selectedT
   const currentModelId = selectedModel || 'stepbystep';
   const currentModel = modelData[currentModelId] || modelData.stepbystep;
   const ModelIcon = currentModel.iconComponent;
+
+  const [showModelTooltip, setShowModelTooltip] = useState(false);
+  const [pressTimer, setPressTimer] = useState<NodeJS.Timeout | null>(null);
+
+  const handleHelpPress = () => {
+    const timer = setTimeout(() => {
+      setShowModelTooltip(true);
+    }, 500);
+    setPressTimer(timer);
+  };
+
+  const handleHelpRelease = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+    setShowModelTooltip(false);
+  };
+
+  const handleHelpClick = () => {
+    if (pressTimer) {
+      clearTimeout(pressTimer);
+      setPressTimer(null);
+    }
+    if (showModelTooltip) {
+      setShowModelTooltip(false);
+    }
+    if (onViewModelIntro) {
+      onViewModelIntro(currentModelId);
+    }
+  };
   return (
     <div className="min-h-screen bg-white pb-8">
       {/* Header */}
       <div className="px-6 pt-12 pb-6 sticky top-0 bg-white z-10 border-b border-gray-100">
         <button
-          onClick={() => onNavigate('topic')}
+          onClick={onGoBack}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -98,8 +132,29 @@ export default function TopicDetailScreen({ onNavigate, selectedModel, selectedT
       {/* Recommended Model */}
       <div className="px-6 pb-4">
         <h2 className="text-sm font-bold text-gray-500 uppercase mb-3">おすすめモデル</h2>
-        <div className={`${currentModel.color} border-2 rounded-2xl p-5`}>
-          <div className="flex items-center justify-between mb-3">
+        <div className={`${currentModel.color} border-2 rounded-2xl p-5 relative`}>
+          {/* Help Button */}
+          <button
+            onClick={handleHelpClick}
+            onMouseDown={handleHelpPress}
+            onMouseUp={handleHelpRelease}
+            onMouseLeave={handleHelpRelease}
+            onTouchStart={handleHelpPress}
+            onTouchEnd={handleHelpRelease}
+            className="absolute top-3 right-3 bg-white hover:bg-gray-50 rounded-full p-2 shadow-md border border-gray-200 transition-colors"
+          >
+            <HelpCircle className="w-4 h-4 text-gray-600" />
+
+            {/* Tooltip */}
+            {showModelTooltip && (
+              <div className="absolute top-full right-0 mt-2 bg-gray-900 text-white text-xs font-medium py-2 px-3 rounded-lg whitespace-nowrap z-10 shadow-xl">
+                {currentModel.name}とは？
+                <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 transform rotate-45"></div>
+              </div>
+            )}
+          </button>
+
+          <div className="flex items-center justify-between mb-3 pr-8">
             <div className="flex items-center gap-3">
               <div className={`${
                 currentModelId === 'prep' ? 'bg-green-500' :
@@ -112,17 +167,8 @@ export default function TopicDetailScreen({ onNavigate, selectedModel, selectedT
                 <p className="text-sm text-gray-600">{currentModel.description}</p>
               </div>
             </div>
-            <button
-              onClick={() => onNavigate('modelList')}
-              className={`${
-                currentModelId === 'prep' ? 'text-green-600' :
-                currentModelId === 'scqa' ? 'text-purple-600' : 'text-blue-600'
-              } text-sm font-semibold`}
-            >
-              変更
-            </button>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="flex gap-2 overflow-x-auto pb-1 mb-3">
             {currentModel.steps.map((step, i) => (
               <span
                 key={i}
@@ -132,6 +178,12 @@ export default function TopicDetailScreen({ onNavigate, selectedModel, selectedT
               </span>
             ))}
           </div>
+          <button
+            onClick={() => onNavigate('modelList')}
+            className="w-full bg-white border border-gray-300 hover:border-gray-400 text-gray-700 font-medium py-2.5 rounded-xl transition-colors text-sm"
+          >
+            モデルを変更する
+          </button>
         </div>
       </div>
 

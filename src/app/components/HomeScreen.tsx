@@ -1,7 +1,8 @@
-import { Flame, Star, Play, BookOpen, TrendingUp } from 'lucide-react';
+import { Flame, Star, Play, BookOpen, TrendingUp, Archive } from 'lucide-react';
 
 interface HomeScreenProps {
   onNavigate: (screen: string) => void;
+  onGoBack: () => void;
 }
 
 export default function HomeScreen({ onNavigate }: HomeScreenProps) {
@@ -9,8 +10,18 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
     <div className="min-h-screen bg-white pb-8">
       {/* Header */}
       <div className="px-6 pt-12 pb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">おはよう!</h1>
-        <p className="text-gray-600">今日も説明の練習を頑張ろう</p>
+        <div className="flex items-start justify-between mb-2">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">おはよう!</h1>
+            <p className="text-gray-600">今日も説明の練習を頑張ろう</p>
+          </div>
+          <button
+            onClick={() => onNavigate('learnedBox')}
+            className="bg-gray-100 hover:bg-gray-200 rounded-2xl p-3 transition-colors"
+          >
+            <Archive className="w-6 h-6 text-gray-700" />
+          </button>
+        </div>
       </div>
 
       {/* Streak Card */}
