@@ -1,10 +1,33 @@
 import { Flame, Star, Play, BookOpen, TrendingUp, Archive } from 'lucide-react';
+import { Topic } from './TopicSelectionScreen';
 
 interface HomeScreenProps {
   onNavigate: (screen: string) => void;
+  onSelectTopic?: (topic: Topic) => void;
+  unreadLearnedBoxCount?: number;
 }
 
-export default function HomeScreen({ onNavigate }: HomeScreenProps) {
+export default function HomeScreen({ onNavigate, onSelectTopic, unreadLearnedBoxCount = 0 }: HomeScreenProps) {
+  // 今日のおすすめトピック
+  const recommendedTopic: Topic = {
+    id: 0,
+    level: '初級',
+    category: 'object',
+    title: 'スマートフォンを説明する',
+    description: '身近なものから始めよう',
+    time: '5分',
+    difficulty: '★☆☆',
+    tags: ['日常会話'],
+    color: 'bg-green-50 border-green-200',
+    badge: 'bg-green-500'
+  };
+
+  const handleStartPractice = () => {
+    if (onSelectTopic) {
+      onSelectTopic(recommendedTopic);
+    }
+    onNavigate('topicDetail');
+  };
   return (
     <div className="min-h-screen bg-white pb-8">
       {/* Header */}
@@ -16,9 +39,14 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
           </div>
           <button
             onClick={() => onNavigate('learnedBox')}
-            className="bg-gray-100 hover:bg-gray-200 rounded-2xl p-3 transition-colors"
+            className="bg-gray-100 hover:bg-gray-200 rounded-2xl p-3 transition-colors relative"
           >
             <Archive className="w-6 h-6 text-gray-700" />
+            {unreadLearnedBoxCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
+                {unreadLearnedBoxCount > 9 ? '9+' : unreadLearnedBoxCount}
+              </span>
+            )}
           </button>
         </div>
       </div>
@@ -57,7 +85,7 @@ export default function HomeScreen({ onNavigate }: HomeScreenProps) {
             <span className="bg-white px-3 py-1 rounded-full">💬 日常会話</span>
           </div>
           <button
-            onClick={() => onNavigate('topic')}
+            onClick={handleStartPractice}
             className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl shadow-lg transition-colors flex items-center justify-center gap-2"
           >
             <Play className="w-5 h-5 fill-white" />

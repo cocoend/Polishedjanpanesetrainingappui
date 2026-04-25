@@ -16,6 +16,7 @@ export default function App() {
   const [modelIntroId, setModelIntroId] = useState<string>('prep');
   const [previousScreen, setPreviousScreen] = useState<string>('home');
   const [modelListOrigin, setModelListOrigin] = useState<string>('home');
+  const [unreadLearnedBoxCount, setUnreadLearnedBoxCount] = useState<number>(0);
 
   const navigateToScreen = (newScreen: string) => {
     setPreviousScreen(currentScreen);
@@ -31,7 +32,13 @@ export default function App() {
   return (
     <div className="size-full bg-white overflow-auto">
       <div className="max-w-md mx-auto">
-        {currentScreen === 'home' && <HomeScreen onNavigate={navigateToScreen} />}
+        {currentScreen === 'home' && (
+          <HomeScreen
+            onNavigate={navigateToScreen}
+            onSelectTopic={setSelectedTopic}
+            unreadLearnedBoxCount={unreadLearnedBoxCount}
+          />
+        )}
         {currentScreen === 'topic' && (
           <TopicSelectionScreen onNavigate={navigateToScreen} onSelectTopic={setSelectedTopic} />
         )}
@@ -75,9 +82,19 @@ export default function App() {
             }}
           />
         )}
-        {currentScreen === 'feedback' && <FeedbackScreen onNavigate={navigateToScreen} />}
+        {currentScreen === 'feedback' && (
+          <FeedbackScreen
+            onNavigate={navigateToScreen}
+            onSaveToLearnedBox={() => setUnreadLearnedBoxCount(prev => prev + 1)}
+          />
+        )}
         {currentScreen === 'retry' && <RetryScreen onNavigate={navigateToScreen} />}
-        {currentScreen === 'learnedBox' && <LearnedBoxScreen onNavigate={navigateToScreen} />}
+        {currentScreen === 'learnedBox' && (
+          <LearnedBoxScreen
+            onNavigate={navigateToScreen}
+            onMarkAsRead={() => setUnreadLearnedBoxCount(0)}
+          />
+        )}
       </div>
     </div>
   );

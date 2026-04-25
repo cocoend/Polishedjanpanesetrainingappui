@@ -1,8 +1,9 @@
 import { ArrowLeft, Calendar, TrendingUp, Award, Play, ChevronRight, Filter } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface LearnedBoxScreenProps {
   onNavigate: (screen: string) => void;
+  onMarkAsRead?: () => void;
 }
 
 interface LearnedRecord {
@@ -69,8 +70,15 @@ const learnedRecords: LearnedRecord[] = [
   }
 ];
 
-export default function LearnedBoxScreen({ onNavigate }: LearnedBoxScreenProps) {
+export default function LearnedBoxScreen({ onNavigate, onMarkAsRead }: LearnedBoxScreenProps) {
   const [filter, setFilter] = useState<'all' | 'recent' | 'high'>('all');
+
+  // 画面表示時に未読カウントをクリア
+  useEffect(() => {
+    if (onMarkAsRead) {
+      onMarkAsRead();
+    }
+  }, [onMarkAsRead]);
 
   const totalRecords = learnedRecords.length;
   const averageScore = Math.round(learnedRecords.reduce((sum, r) => sum + r.score, 0) / totalRecords);

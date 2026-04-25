@@ -3,13 +3,31 @@ import { useState } from 'react';
 
 interface FeedbackScreenProps {
   onNavigate: (screen: string) => void;
+  onSaveToLearnedBox?: () => void;
 }
 
-export default function FeedbackScreen({ onNavigate }: FeedbackScreenProps) {
+export default function FeedbackScreen({ onNavigate, onSaveToLearnedBox }: FeedbackScreenProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section);
+  };
+
+  const handleSaveToLearnedBox = () => {
+    // フィードバックを学んだBOXに保存する処理
+    // TODO: 実際の保存ロジックを実装
+    setIsSaved(true);
+
+    // 未読カウントを増加
+    if (onSaveToLearnedBox) {
+      onSaveToLearnedBox();
+    }
+
+    // 2秒後に保存状態をリセット
+    setTimeout(() => {
+      setIsSaved(false);
+    }, 2000);
   };
 
   return (
@@ -264,10 +282,23 @@ export default function FeedbackScreen({ onNavigate }: FeedbackScreenProps) {
           改善してもう一度挑戦
         </button>
         <button
-          onClick={() => onNavigate('learnedBox')}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-md flex items-center justify-center gap-3 transition-colors"
+          onClick={handleSaveToLearnedBox}
+          className={`w-full ${
+            isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-600'
+          } text-white font-bold py-4 rounded-2xl shadow-md flex items-center justify-center gap-3 transition-colors`}
+          disabled={isSaved}
         >
-          結果を保存して学んだBOXへ
+          {isSaved ? (
+            <>
+              <CheckCircle2 className="w-5 h-5" />
+              保存しました！
+            </>
+          ) : (
+            <>
+              <BookOpen className="w-5 h-5" />
+              結果を保存して学んだBOXへ
+            </>
+          )}
         </button>
         <button
           onClick={() => onNavigate('home')}
