@@ -1,0 +1,48 @@
+import { z } from 'zod';
+export declare const learnedCardSchema: z.ZodObject<{
+    id: z.ZodString;
+    sessionId: z.ZodString;
+    feedbackId: z.ZodString;
+    themeId: z.ZodString;
+    title: z.ZodString;
+    summary: z.ZodString;
+    keyTakeaways: z.ZodArray<z.ZodString, "many">;
+    examplePhrases: z.ZodArray<z.ZodString, "many">;
+    latestScore: z.ZodNumber;
+    bestScore: z.ZodNumber;
+    attemptCount: z.ZodNumber;
+    isRead: z.ZodBoolean;
+    savedAt: z.ZodString;
+    readAt: z.ZodNullable<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    themeId: string;
+    id: string;
+    sessionId: string;
+    feedbackId: string;
+    title: string;
+    summary: string;
+    keyTakeaways: string[];
+    examplePhrases: string[];
+    latestScore: number;
+    bestScore: number;
+    attemptCount: number;
+    isRead: boolean;
+    savedAt: string;
+    readAt: string | null;
+}, {
+    themeId: string;
+    id: string;
+    sessionId: string;
+    feedbackId: string;
+    title: string;
+    summary: string;
+    keyTakeaways: string[];
+    examplePhrases: string[];
+    latestScore: number;
+    bestScore: number;
+    attemptCount: number;
+    isRead: boolean;
+    savedAt: string;
+    readAt: string | null;
+}>;
+export type LearnedCardDto = z.infer<typeof learnedCardSchema>;

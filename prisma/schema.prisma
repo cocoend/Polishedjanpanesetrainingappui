@@ -1,0 +1,201 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../apps/api/src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  anonymous
+  registered
+}
+
+enum SessionStatus {
+  draft
+  recording
+  uploaded
+  transcribed
+  feedback_ready
+  completed
+  abandoned
+}
+
+enum ProcessingStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+model User {
+  id                String            @id @default(uuid())
+  anonymousUserId   String            @unique
+  userType          UserType          @default(anonymous)
+  registeredUserId  String?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  lastActiveAt      DateTime          @default(now())
+  sessions          PracticeSession[]
+  learnedCards      LearnedCard[]
+}
+
+model PracticeTheme {
+  id                  String             @id @default(uuid())
+  slug                String             @unique
+  level               String
+  category            String
+  title               String
+  description         String
+  promptText          String
+  explanationGoal     String
+  recommendedModelId  String
+  keywords            Json
+  usefulExpressions   Json
+  hints               Json
+  estimatedMinutes    Int
+  difficulty          Int
+  purposeTags         Json
+  sortOrder           Int                @default(0)
+  nextThemeId         String?
+  isActive            Boolean            @default(true)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  recommendedModel    ExplanationModel   @relation("ThemeRecommendedModel", fields: [recommendedModelId], references: [id])
+  nextTheme           PracticeTheme?     @relation("ThemeSequence", fields: [nextThemeId], references: [id])
+  previousThemes      PracticeTheme[]    @relation("ThemeSequence")
+  sessions            PracticeSession[]
+  learnedCards        LearnedCard[]
+}
+
+model ExplanationModel {
+  id                String            @id @default(uuid())
+  slug              String            @unique
+  nameJa            String
+  shortDescription  String
+  longDescription   String
+  structureLabel    String
+  steps             Json
+  features          Json
+  suitableFor       Json
+  sortOrder         Int               @default(0)
+  isActive          Boolean           @default(true)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  recommendedBy     PracticeTheme[]   @relation("ThemeRecommendedModel")
+  sessions          PracticeSession[]
+}
+
+model PracticeSession {
+  id                   String            @id @default(uuid())
+  userId               String
+  themeId              String
+  selectedModelId      String
+  status               SessionStatus     @default(draft)
+  latestAttemptId      String?            @unique
+  completionThreshold  Int               @default(100)
+  startedAt            DateTime          @default(now())
+  completedAt          DateTime?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  user                 User              @relation(fields: [userId], references: [id])
+  theme                PracticeTheme     @relation(fields: [themeId], references: [id])
+  selectedModel        ExplanationModel  @relation(fields: [selectedModelId], references: [id])
+  latestAttempt        AnswerAttempt?    @relation("LatestSessionAttempt", fields: [latestAttemptId], references: [id])
+  attempts             AnswerAttempt[]   @relation("SessionAttempts")
+  feedbacks            Feedback[]
+  learnedCards         LearnedCard[]
+
+  @@index([userId, status])
+  @@index([themeId])
+}
+
+model AnswerAttempt {
+  id                    String             @id @default(uuid())
+  sessionId             String
+  attemptIndex          Int
+  audioStorageKey       String?
+  audioMimeType         String
+  audioDurationSec      Int
+  audioFileSizeBytes    Int
+  transcriptText        String             @default("")
+  transcriptLanguage    String             @default("ja")
+  transcriptionProvider String?
+  transcriptionModel    String?
+  transcriptionStatus   ProcessingStatus   @default(pending)
+  submittedAt           DateTime           @default(now())
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+  session               PracticeSession    @relation("SessionAttempts", fields: [sessionId], references: [id])
+  latestForSession      PracticeSession?   @relation("LatestSessionAttempt")
+  feedback              Feedback?
+
+  @@unique([sessionId, attemptIndex])
+  @@index([sessionId, submittedAt])
+}
+
+model Feedback {
+  id                         String             @id @default(uuid())
+  attemptId                  String             @unique
+  sessionId                  String
+  totalScore                 Int
+  modelFitScore              Int
+  topicCoverageScore         Int
+  structureScore             Int
+  grammarScore               Int
+  clarityScore               Int
+  strengths                  Json
+  improvementPoints          Json
+  retryFocusPoints           Json
+  improvedAnswerExample      String
+  recommendReason            String?
+  isPerfectScore             Boolean            @default(false)
+  completionThresholdSnapshot Int
+  aiProvider                 String
+  aiModel                    String
+  promptVersion              String
+  rubricVersion              String
+  rawResponseJson            Json
+  generationStatus           ProcessingStatus   @default(pending)
+  errorMessage               String?
+  createdAt                  DateTime           @default(now())
+  updatedAt                  DateTime           @updatedAt
+  attempt                    AnswerAttempt      @relation(fields: [attemptId], references: [id])
+  session                    PracticeSession    @relation(fields: [sessionId], references: [id])
+  learnedCards               LearnedCard[]
+
+  @@index([sessionId, createdAt])
+}
+
+model LearnedCard {
+  id              String           @id @default(uuid())
+  userId          String
+  sessionId       String
+  feedbackId      String
+  themeId         String
+  themeLevel      String
+  selectedModelId String
+  title           String
+  summary         String
+  keyTakeaways    Json
+  examplePhrases  Json
+  purposeTags     Json
+  latestScore     Int
+  bestScore       Int
+  attemptCount    Int
+  improvementFromFirstScore Int
+  isRead          Boolean          @default(false)
+  savedAt         DateTime         @default(now())
+  readAt          DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  user            User             @relation(fields: [userId], references: [id])
+  session         PracticeSession  @relation(fields: [sessionId], references: [id])
+  feedback        Feedback         @relation(fields: [feedbackId], references: [id])
+  theme           PracticeTheme    @relation(fields: [themeId], references: [id])
+
+  @@index([userId, savedAt])
+  @@index([userId, isRead])
+}
