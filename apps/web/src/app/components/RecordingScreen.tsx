@@ -14,6 +14,12 @@ interface RecordingScreenProps {
     audioFileSizeBytes: number;
     audioFile?: File;
   }) => void | Promise<void>;
+  onTranscribeRecording?: (payload: {
+    audioFile: File;
+    audioMimeType: string;
+    audioDurationSec: number;
+    audioFileSizeBytes: number;
+  }) => Promise<{ attemptId?: string; transcriptText: string }>;
   onViewModelIntro?: (modelId: string) => void;
 }
 
@@ -29,6 +35,7 @@ export default function RecordingScreen({
   selectedTopic,
   activeSessionId: _activeSessionId,
   onSubmitAttempt,
+  onTranscribeRecording,
   onViewModelIntro,
 }: RecordingScreenProps) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -85,6 +92,9 @@ export default function RecordingScreen({
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [transcript, setTranscript] = useState('');
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const [transcriptionError, setTranscriptionError] = useState<string | null>(null);
+  const [hasServerAttempt, setHasServerAttempt] = useState(false);
   const [hasRecorded, setHasRecorded] = useState(false);
   const [recordedAudioFile, setRecordedAudioFile] = useState<File | null>(null);
   const [recordedDurationSec, setRecordedDurationSec] = useState(0);
@@ -117,9 +127,6 @@ export default function RecordingScreen({
     };
   }, []);
 
-  const fallbackTranscript =
-    'スマートフォンというのは、携帯電話の一つです。画面を指で触って操作することができます。例えば、インターネットで調べ物をしたり、友達とメッセージを送ったり、写真を撮ったりすることができます。';
-
   const beginFallbackRecording = () => {
     recordedChunksRef.current = [];
     recordedFileRef.current = null;
@@ -128,6 +135,8 @@ export default function RecordingScreen({
     recordingStartedAtRef.current = Date.now();
     setRecordingTime(0);
     setTranscript('');
+    setTranscriptionError(null);
+    setHasServerAttempt(false);
     setIsRecording(true);
   };
 
@@ -139,8 +148,41 @@ export default function RecordingScreen({
     setHasRecorded(true);
     setRecordingTime(elapsedSec);
     setRecordedDurationSec(elapsedSec);
-    setTranscript(fallbackTranscript);
+    setTranscript('');
+    setTranscriptionError('このブラウザでは音声ファイルを録音できません。もう一度お試しください。');
+    setHasServerAttempt(false);
     recordingStartedAtRef.current = null;
+  };
+
+  const transcribeRecordedAudio = async (recordedFile: File, durationSec: number) => {
+    if (!onTranscribeRecording) {
+      return;
+    }
+
+    setIsTranscribing(true);
+    setTranscriptionError(null);
+    setHasServerAttempt(false);
+    setTranscript('');
+
+    try {
+      const result = await onTranscribeRecording({
+        audioFile: recordedFile,
+        audioMimeType: recordedFile.type || 'audio/webm',
+        audioDurationSec: durationSec,
+        audioFileSizeBytes: recordedFile.size,
+      });
+
+      if (!result.transcriptText.trim()) {
+        throw new Error('Transcription returned empty text.');
+      }
+
+      setTranscript(result.transcriptText);
+      setHasServerAttempt(Boolean(result.attemptId));
+    } catch {
+      setTranscriptionError('音声認識に失敗しました。録音し直すか、API設定を確認してください。');
+    } finally {
+      setIsTranscribing(false);
+    }
   };
 
   const handleRecordToggle = async () => {
@@ -185,6 +227,8 @@ export default function RecordingScreen({
       setRecordedAudioFile(null);
       setRecordedDurationSec(0);
       setTranscript('');
+      setTranscriptionError(null);
+      setHasServerAttempt(false);
       setHasRecorded(false);
       recordingStartedAtRef.current = Date.now();
       setRecordingTime(0);
@@ -213,9 +257,9 @@ export default function RecordingScreen({
         setRecordingTime(elapsedSec);
         setIsRecording(false);
         setHasRecorded(true);
-        setTranscript(fallbackTranscript);
         recordingStartedAtRef.current = null;
         stopMediaResources();
+        void transcribeRecordedAudio(recordedFile, elapsedSec);
       };
 
       mediaRecorder.start();
@@ -236,6 +280,9 @@ export default function RecordingScreen({
     setIsRecording(false);
     setRecordingTime(0);
     setTranscript('');
+    setTranscriptionError(null);
+    setIsTranscribing(false);
+    setHasServerAttempt(false);
     setHasRecorded(false);
     setRecordedAudioFile(null);
     setRecordedDurationSec(0);
@@ -327,7 +374,9 @@ export default function RecordingScreen({
               </div>
             )}
             {!isRecording && hasRecorded && (
-              <span className="text-sm font-medium text-gray-600">録音完了</span>
+              <span className="text-sm font-medium text-gray-600">
+                {isTranscribing ? '音声認識中' : '録音完了'}
+              </span>
             )}
             {!isRecording && !hasRecorded && (
               <span className="text-sm font-medium text-gray-500">タップして録音開始</span>
@@ -370,7 +419,7 @@ export default function RecordingScreen({
       </div>
 
       {/* Live Transcript */}
-      {(transcript || isRecording) && (
+      {(transcript || isRecording || hasRecorded || isTranscribing || transcriptionError) && (
         <div className="px-6 pb-6">
           <div className="bg-white rounded-3xl p-6 border-2 border-gray-200 shadow-sm min-h-[160px]">
             <div className="flex items-center gap-2 mb-3">
@@ -379,6 +428,10 @@ export default function RecordingScreen({
             </div>
             {transcript ? (
               <p className="text-gray-900 leading-relaxed">{transcript}</p>
+            ) : isTranscribing ? (
+              <p className="text-gray-500">AIが音声を文字起こししています...</p>
+            ) : transcriptionError ? (
+              <p className="text-red-600 leading-relaxed">{transcriptionError}</p>
             ) : (
               <p className="text-gray-400 italic">話した内容がここに表示されます...</p>
             )}
@@ -392,6 +445,11 @@ export default function RecordingScreen({
           <>
             <button
               onClick={() => {
+                if (hasServerAttempt) {
+                  onNavigate('feedback');
+                  return;
+                }
+
                 if (onSubmitAttempt) {
                   void onSubmitAttempt({
                     transcriptText: transcript,
@@ -406,10 +464,11 @@ export default function RecordingScreen({
 
                 onNavigate('feedback');
               }}
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-5 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-colors"
+              disabled={isTranscribing || !transcript.trim()}
+              className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-5 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-colors"
             >
               <Send className="w-5 h-5" />
-              AIフィードバックを受ける
+              {isTranscribing ? '音声認識中...' : 'AIフィードバックを受ける'}
             </button>
             <button
               onClick={handleReset}

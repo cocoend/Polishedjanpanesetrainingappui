@@ -318,7 +318,7 @@ export class AttemptStoreService {
     audioDurationSec: number;
     audioFileSizeBytes: number;
   }) {
-    if (!input.audioMimeType || !ALLOWED_AUDIO_MIME_TYPES.has(input.audioMimeType)) {
+    if (!this.isAllowedAudioMimeType(input.audioMimeType)) {
       throw new BadRequestException('Only webm audio uploads are supported for now.');
     }
 
@@ -341,10 +341,18 @@ export class AttemptStoreService {
       return originalExtension;
     }
 
-    if (mimeType === 'audio/webm' || mimeType === 'video/webm') {
+    if (this.isAllowedAudioMimeType(mimeType)) {
       return 'webm';
     }
 
     return 'bin';
+  }
+
+  private isAllowedAudioMimeType(mimeType: string) {
+    const normalizedMimeType = mimeType.split(';')[0]?.trim().toLowerCase();
+
+    return Boolean(
+      normalizedMimeType && ALLOWED_AUDIO_MIME_TYPES.has(normalizedMimeType),
+    );
   }
 }

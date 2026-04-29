@@ -1,7 +1,7 @@
 import { access, readFile } from 'node:fs/promises';
 import { basename, join } from 'node:path';
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 type TranscriptionModelId = 'prep' | 'stepbystep' | 'scqa' | string;
 type TranscriptionProviderId = 'template' | 'openai';
@@ -25,8 +25,6 @@ const DEFAULT_TRANSCRIPTION_PROVIDER: TranscriptionProviderId = 'template';
 
 @Injectable()
 export class TranscriptionService {
-  private readonly logger = new Logger(TranscriptionService.name);
-
   async transcribeUploadedAttempt(input: TranscriptionRequest): Promise<TranscriptionResult> {
     const provider = this.resolveProvider();
 
@@ -34,7 +32,7 @@ export class TranscriptionService {
       return this.transcribeWithTemplateProvider(input);
     }
 
-    return this.transcribeWithOpenAiFallback(input);
+    return this.transcribeWithOpenAiProvider(input);
   }
 
   private resolveProvider(): TranscriptionProviderId {
@@ -64,29 +62,6 @@ export class TranscriptionService {
       transcriptText,
       transcriptionProvider: 'template',
       transcriptionModel: 'template-ja-v2',
-    });
-  }
-
-  private transcribeWithOpenAiFallback(
-    input: TranscriptionRequest,
-  ): Promise<TranscriptionResult> {
-    return this.transcribeWithOpenAiProvider(input).catch((error: unknown) => {
-      this.logger.warn(
-        `OpenAI transcription fallback activated: ${error instanceof Error ? error.message : 'unknown error'}`,
-      );
-
-      const transcriptText = this.buildTranscriptTemplate(
-        input.themeTitle,
-        input.selectedModelId,
-        input.audioDurationSec,
-      );
-
-      return {
-        transcriptText,
-        transcriptionProvider: 'openai-fallback-template',
-        transcriptionModel:
-          process.env.OPENAI_TRANSCRIPTION_MODEL?.trim() || 'gpt-4o-mini-transcribe',
-      };
     });
   }
 

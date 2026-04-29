@@ -113,6 +113,12 @@ export function getAttempt(attemptId: string) {
   return request<AttemptDto>(`/api/attempts/${attemptId}`);
 }
 
+export function transcribeAttempt(attemptId: string) {
+  return request<AttemptDto>(`/api/attempts/${attemptId}/transcribe`, {
+    method: 'POST',
+  });
+}
+
 export function createFeedback(attemptId: string) {
   return request<FeedbackDto>(`/api/attempts/${attemptId}/feedback`, {
     method: 'POST',

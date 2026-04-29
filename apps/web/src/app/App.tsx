@@ -8,7 +8,7 @@ import RecordingScreen from './components/RecordingScreen';
 import FeedbackScreen from './components/FeedbackScreen';
 import RetryScreen from './components/RetryScreen';
 import LearnedBoxScreen from './components/LearnedBoxScreen';
-import { createAttempt, createAttemptUpload, createSession } from './lib/api';
+import { createAttempt, createAttemptUpload, createSession, transcribeAttempt } from './lib/api';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('home');
@@ -34,6 +34,8 @@ export default function App() {
     setActiveSessionId(input.sessionId);
     setActiveSessionThemeId(input.topic.id);
     setActiveSessionModelId(input.selectedModelId);
+    setActiveAttemptId(null);
+    setLatestTranscriptText('');
     setPreviousScreen(currentScreen);
     setCurrentScreen('recording');
   };
@@ -56,6 +58,8 @@ export default function App() {
           setActiveSessionId(session.id);
           setActiveSessionThemeId(session.themeId);
           setActiveSessionModelId(session.selectedModelId);
+          setActiveAttemptId(null);
+          setLatestTranscriptText('');
         } catch {
           // Keep the current prototype navigation behavior even if the API is unavailable.
         }
@@ -121,6 +125,28 @@ export default function App() {
             selectedModel={selectedModel}
             selectedTopic={selectedTopic}
             activeSessionId={activeSessionId}
+            onTranscribeRecording={async (payload) => {
+              if (!activeSessionId) {
+                throw new Error('Active session is required before transcribing audio.');
+              }
+
+              const uploadedAttempt = await createAttemptUpload(activeSessionId, {
+                audio: payload.audioFile,
+                audioDurationSec: payload.audioDurationSec,
+              });
+              const attempt =
+                uploadedAttempt.transcriptionStatus === 'completed'
+                  ? uploadedAttempt
+                  : await transcribeAttempt(uploadedAttempt.id);
+
+              setActiveAttemptId(attempt.id);
+              setLatestTranscriptText(attempt.transcriptText);
+
+              return {
+                attemptId: attempt.id,
+                transcriptText: attempt.transcriptText,
+              };
+            }}
             onSubmitAttempt={async (payload) => {
               if (!activeSessionId) {
                 navigateToScreen('feedback');
