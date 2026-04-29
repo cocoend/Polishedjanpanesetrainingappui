@@ -1,4 +1,4 @@
-import { ArrowLeft, Mic, Square, RotateCcw, Send, BookOpen, Sparkles, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Mic, Square, RotateCcw, Send, BookOpen, Sparkles, HelpCircle, Loader2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Topic } from './TopicSelectionScreen';
 
@@ -98,6 +98,7 @@ export default function RecordingScreen({
   const [hasRecorded, setHasRecorded] = useState(false);
   const [recordedAudioFile, setRecordedAudioFile] = useState<File | null>(null);
   const [recordedDurationSec, setRecordedDurationSec] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (!isRecording) {
@@ -270,6 +271,10 @@ export default function RecordingScreen({
   };
 
   const handleReset = () => {
+    if (isProcessing) {
+      return;
+    }
+
     const recorder = mediaRecorderRef.current;
 
     if (recorder && recorder.state !== 'inactive') {
@@ -286,7 +291,36 @@ export default function RecordingScreen({
     setHasRecorded(false);
     setRecordedAudioFile(null);
     setRecordedDurationSec(0);
+    setIsProcessing(false);
     recordingStartedAtRef.current = null;
+  };
+
+  const handleFeedbackRequest = async () => {
+    if (isProcessing || isTranscribing || !transcript.trim()) {
+      return;
+    }
+
+    setIsProcessing(true);
+    setTranscriptionError(null);
+
+    try {
+      if (onSubmitAttempt) {
+        await onSubmitAttempt({
+          transcriptText: transcript,
+          audioMimeType: recordedAudioFile?.type || 'audio/webm',
+          audioDurationSec: recordedDurationSec || recordingTime || 125,
+          audioFileSizeBytes:
+            recordedAudioFile?.size ?? Math.max(1024, transcript.length * 8),
+          audioFile: hasServerAttempt ? undefined : recordedAudioFile ?? undefined,
+        });
+        return;
+      }
+
+      onNavigate('feedback');
+    } catch {
+      setTranscriptionError('AIフィードバックの作成に失敗しました。時間をおいてもう一度お試しください。');
+      setIsProcessing(false);
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -445,34 +479,30 @@ export default function RecordingScreen({
           <>
             <button
               onClick={() => {
-                if (hasServerAttempt) {
-                  onNavigate('feedback');
-                  return;
-                }
-
-                if (onSubmitAttempt) {
-                  void onSubmitAttempt({
-                    transcriptText: transcript,
-                    audioMimeType: recordedAudioFile?.type || 'audio/webm',
-                    audioDurationSec: recordedDurationSec || recordingTime || 125,
-                    audioFileSizeBytes:
-                      recordedAudioFile?.size ?? Math.max(1024, transcript.length * 8),
-                    audioFile: recordedAudioFile ?? undefined,
-                  });
-                  return;
-                }
-
-                onNavigate('feedback');
+                void handleFeedbackRequest();
               }}
-              disabled={isTranscribing || !transcript.trim()}
-              className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-5 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-colors"
+              disabled={isTranscribing || isProcessing || !transcript.trim()}
+              className={`w-full ${
+                isProcessing
+                  ? 'bg-blue-500'
+                  : 'bg-green-500 hover:bg-green-600'
+              } disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-5 rounded-2xl shadow-lg flex items-center justify-center gap-3 transition-colors`}
             >
-              <Send className="w-5 h-5" />
-              {isTranscribing ? '音声認識中...' : 'AIフィードバックを受ける'}
+              {isProcessing ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
+              {isProcessing
+                ? 'AIフィードバック作成中'
+                : isTranscribing
+                  ? '音声認識中...'
+                  : 'AIフィードバックを受ける'}
             </button>
             <button
               onClick={handleReset}
-              className="w-full bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-colors"
+              disabled={isProcessing}
+              className="w-full bg-white border-2 border-gray-300 hover:border-gray-400 disabled:bg-gray-100 disabled:border-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-gray-700 font-bold py-4 rounded-2xl flex items-center justify-center gap-3 transition-colors"
             >
               <RotateCcw className="w-5 h-5" />
               もう一度録音する

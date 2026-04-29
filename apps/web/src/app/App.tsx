@@ -8,7 +8,8 @@ import RecordingScreen from './components/RecordingScreen';
 import FeedbackScreen from './components/FeedbackScreen';
 import RetryScreen from './components/RetryScreen';
 import LearnedBoxScreen from './components/LearnedBoxScreen';
-import { createAttempt, createAttemptUpload, createSession, transcribeAttempt } from './lib/api';
+import type { FeedbackDto } from '@polished/shared';
+import { createAttempt, createAttemptUpload, createFeedback, createSession, transcribeAttempt } from './lib/api';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('home');
@@ -23,6 +24,7 @@ export default function App() {
   const [activeSessionModelId, setActiveSessionModelId] = useState<string | null>(null);
   const [activeAttemptId, setActiveAttemptId] = useState<string | null>(null);
   const [latestTranscriptText, setLatestTranscriptText] = useState<string>('');
+  const [activeFeedback, setActiveFeedback] = useState<FeedbackDto | null>(null);
 
   const resumeSession = (input: {
     sessionId: string;
@@ -36,6 +38,7 @@ export default function App() {
     setActiveSessionModelId(input.selectedModelId);
     setActiveAttemptId(null);
     setLatestTranscriptText('');
+    setActiveFeedback(null);
     setPreviousScreen(currentScreen);
     setCurrentScreen('recording');
   };
@@ -60,6 +63,7 @@ export default function App() {
           setActiveSessionModelId(session.selectedModelId);
           setActiveAttemptId(null);
           setLatestTranscriptText('');
+          setActiveFeedback(null);
         } catch {
           // Keep the current prototype navigation behavior even if the API is unavailable.
         }
@@ -141,6 +145,7 @@ export default function App() {
 
               setActiveAttemptId(attempt.id);
               setLatestTranscriptText(attempt.transcriptText);
+              setActiveFeedback(null);
 
               return {
                 attemptId: attempt.id,
@@ -149,12 +154,17 @@ export default function App() {
             }}
             onSubmitAttempt={async (payload) => {
               if (!activeSessionId) {
-                navigateToScreen('feedback');
-                return;
+                throw new Error('Active session is required before creating feedback.');
               }
 
-              try {
-                const attempt = payload.audioFile
+              const existingAttemptCanBeUsed =
+                activeAttemptId &&
+                latestTranscriptText.trim() &&
+                latestTranscriptText.trim() === payload.transcriptText.trim();
+
+              const attempt = existingAttemptCanBeUsed
+                ? await transcribeAttempt(activeAttemptId)
+                : payload.audioFile
                   ? await createAttemptUpload(activeSessionId, {
                       audio: payload.audioFile,
                       audioDurationSec: payload.audioDurationSec,
@@ -165,12 +175,11 @@ export default function App() {
                       audioDurationSec: payload.audioDurationSec,
                       audioFileSizeBytes: payload.audioFileSizeBytes,
                     });
-                setActiveAttemptId(attempt.id);
-                setLatestTranscriptText(attempt.transcriptText);
-              } catch {
-                // Keep the prototype flow even if the API is unavailable.
-              }
+              const feedback = await createFeedback(attempt.id);
 
+              setActiveAttemptId(attempt.id);
+              setLatestTranscriptText(attempt.transcriptText);
+              setActiveFeedback(feedback);
               navigateToScreen('feedback');
             }}
             onViewModelIntro={(id) => {
@@ -185,6 +194,7 @@ export default function App() {
             latestTranscriptText={latestTranscriptText}
             activeAttemptId={activeAttemptId}
             activeSessionId={activeSessionId}
+            initialFeedback={activeFeedback}
             onSaveToLearnedBox={() => setUnreadLearnedBoxCount(prev => prev + 1)}
           />
         )}

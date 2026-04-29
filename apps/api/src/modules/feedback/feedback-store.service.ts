@@ -56,6 +56,31 @@ export class FeedbackStoreService {
       return existing;
     }
 
+    const prisma = await this.prismaService.getOptionalClient();
+
+    if (prisma) {
+      try {
+        const feedbackDelegate = prisma.feedback as {
+          findUnique: (args: {
+            where: Record<string, unknown>;
+          }) => Promise<Record<string, unknown> | null>;
+        };
+        const existingPersisted = await feedbackDelegate.findUnique({
+          where: {
+            attemptId,
+          },
+        });
+
+        if (existingPersisted) {
+          const mappedExisting = this.mapPrismaFeedback(existingPersisted);
+          this.cacheFeedback(mappedExisting);
+          return mappedExisting;
+        }
+      } catch {
+        // Fall through to generation if the persistent lookup is unavailable.
+      }
+    }
+
     let attempt = await this.attemptStore.getAttemptById(attemptId);
     const session = await this.sessionStore.getSessionById(attempt.sessionId);
     const theme = findThemeByIdOrSlug(session.themeId);
@@ -83,7 +108,6 @@ export class FeedbackStoreService {
       themeKeywords: theme?.keywords ?? [],
     });
     const feedback = this.buildStoredFeedback(attempt, session, generatedFeedback);
-    const prisma = await this.prismaService.getOptionalClient();
 
     if (!prisma) {
       this.cacheFeedback(feedback);
@@ -95,22 +119,8 @@ export class FeedbackStoreService {
 
     try {
       const feedbackDelegate = prisma.feedback as {
-        findUnique: (args: {
-          where: Record<string, unknown>;
-        }) => Promise<Record<string, unknown> | null>;
         create: (args: { data: Record<string, unknown> }) => Promise<Record<string, unknown>>;
       };
-      const existingPersisted = await feedbackDelegate.findUnique({
-        where: {
-          attemptId,
-        },
-      });
-
-      if (existingPersisted) {
-        const mappedExisting = this.mapPrismaFeedback(existingPersisted);
-        this.cacheFeedback(mappedExisting);
-        return mappedExisting;
-      }
 
       const created = await feedbackDelegate.create({
         data: {

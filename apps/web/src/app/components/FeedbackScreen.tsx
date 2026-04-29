@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle2, AlertCircle, Lightbulb, RotateCcw, BookOpen, ChevronDown, Star, TrendingUp } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertCircle, Lightbulb, RotateCcw, BookOpen, ChevronDown, Star, TrendingUp, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import type { FeedbackDto } from '@polished/shared';
@@ -10,6 +10,7 @@ interface FeedbackScreenProps {
   latestTranscriptText?: string;
   activeAttemptId?: string | null;
   activeSessionId?: string | null;
+  initialFeedback?: FeedbackDto | null;
   onSaveToLearnedBox?: () => void;
 }
 
@@ -18,50 +19,21 @@ export default function FeedbackScreen({
   latestTranscriptText,
   activeAttemptId,
   activeSessionId,
+  initialFeedback,
   onSaveToLearnedBox,
 }: FeedbackScreenProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [feedback, setFeedback] = useState<FeedbackDto>({
-    id: 'mock-feedback',
-    sessionId: 'mock-session',
-    attemptId: 'mock-attempt',
-    totalScore: 78,
-    modelFitScore: 40,
-    topicCoverageScore: 10,
-    structureScore: 3,
-    grammarScore: 8,
-    clarityScore: 17,
-    strengths: [
-      '構造を意識して説明モデルに沿って話せています。',
-      'テーマに必要なキーワードを押さえて説明できています。',
-      '全体として伝えたい内容がわかりやすく整理されています。',
-    ],
-    improvementPoints: [
-      '「画面を指で触って操作する」より「画面を指で触れて操作する」の方が自然です。',
-      '最後に一文でまとめを入れると、説明全体が締まって聞き手に残りやすくなります。',
-      'テーマに関連する具体的なキーワードをあと1〜2個加えると、内容の網羅性が上がります。',
-    ],
-    retryFocusPoints: [
-      '「画面を指で触って操作する」より「画面を指で触れて操作する」の方が自然です。',
-      '最後に一文でまとめを入れると、説明全体が締まって聞き手に残りやすくなります。',
-      'テーマに関連する具体的なキーワードをあと1〜2個加えると、内容の網羅性が上がります。',
-    ],
-    improvedAnswerExample:
-      'スマートフォンというのは、小型の携帯端末です。画面を指で触れて操作することができます。例えば、インターネットで調べ物をしたり、友達とメッセージを送ったり、写真を撮ったりすることができます。このように、いつでもどこでも使える便利な道具です。',
-    recommendReason: '前回のスコアが100点未満のため、同じテーマでもう一度練習しましょう。',
-    isPerfectScore: false,
-    completionThresholdSnapshot: 100,
-    aiProvider: 'mvp-rule-engine',
-    aiModel: 'prototype-v1',
-    promptVersion: 'feedback-prompt-v1',
-    rubricVersion: 'rubric-v1',
-    generationStatus: 'completed',
-    createdAt: new Date().toISOString(),
-  });
+  const [feedback, setFeedback] = useState<FeedbackDto | null>(initialFeedback ?? null);
 
   useEffect(() => {
+    if (initialFeedback) {
+      setFeedback(initialFeedback);
+      return;
+    }
+
     if (!activeAttemptId) {
+      setFeedback(null);
       return;
     }
 
@@ -82,7 +54,7 @@ export default function FeedbackScreen({
     return () => {
       isMounted = false;
     };
-  }, [activeAttemptId]);
+  }, [activeAttemptId, initialFeedback]);
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section);
@@ -115,6 +87,28 @@ export default function FeedbackScreen({
         finishSavedState();
       });
   };
+
+  if (!feedback) {
+    return (
+      <div className="min-h-screen bg-white pb-8">
+        <div className="px-6 pt-12 pb-6 sticky top-0 bg-white z-10 border-b border-gray-100">
+          <button
+            onClick={() => onNavigate('recording')}
+            className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">戻る</span>
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">AIフィードバック</h1>
+          <p className="text-gray-600 text-sm">あなたの説明を分析しました</p>
+        </div>
+        <div className="px-6 pt-20 flex flex-col items-center gap-3 text-gray-600">
+          <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+          <p className="text-sm font-medium">AIフィードバック作成中</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white pb-8">
