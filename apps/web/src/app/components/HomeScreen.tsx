@@ -16,6 +16,7 @@ interface HomeScreenProps {
     selectedModelId: string | null;
   }) => void;
   unreadLearnedBoxCount?: number;
+  refreshKey?: number;
 }
 
 export default function HomeScreen({
@@ -23,6 +24,7 @@ export default function HomeScreen({
   onSelectTopic,
   onResumeSession,
   unreadLearnedBoxCount = 0,
+  refreshKey = 0,
 }: HomeScreenProps) {
   // 今日のおすすめトピック
   const recommendedTopic: Topic = {
@@ -57,7 +59,7 @@ export default function HomeScreen({
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [refreshKey]);
 
   const effectiveRecommendedTopic = homeData?.recommendedTheme
     ? mapThemeListItemToTopic(homeData.recommendedTheme)

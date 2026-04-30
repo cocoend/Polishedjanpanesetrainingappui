@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, CheckCircle2, ListOrdered, MessageSquare, Lightbulb, HelpCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, ListOrdered, MessageSquare, Lightbulb } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { getExplanationModels } from '../lib/api';
@@ -90,8 +90,6 @@ const models = [
 ];
 
 export default function ModelListScreen({ onNavigate, originScreen, onSelectModel, onViewIntro }: ModelListScreenProps) {
-  const [hoveredModel, setHoveredModel] = useState<string | null>(null);
-  const [pressTimer, setPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
   const [apiModels, setApiModels] = useState(models);
 
   useEffect(() => {
@@ -131,29 +129,7 @@ export default function ModelListScreen({ onNavigate, originScreen, onSelectMode
     onNavigate('topicDetail');
   };
 
-  const handleHelpPress = (modelId: string) => {
-    const timer = setTimeout(() => {
-      setHoveredModel(modelId);
-    }, 500);
-    setPressTimer(timer);
-  };
-
-  const handleHelpRelease = () => {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      setPressTimer(null);
-    }
-    setHoveredModel(null);
-  };
-
   const handleHelpClick = (modelId: string) => {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      setPressTimer(null);
-    }
-    if (hoveredModel === modelId) {
-      setHoveredModel(null);
-    }
     if (onViewIntro) {
       onViewIntro(modelId);
     }
@@ -198,26 +174,13 @@ export default function ModelListScreen({ onNavigate, originScreen, onSelectMode
               key={model.id}
               className={`${model.bgColor} rounded-3xl p-6 border-2 ${model.borderColor} shadow-md relative`}
             >
-              {/* Help Button */}
-              <div className="absolute top-4 right-4">
+              {/* もっと説明 Button */}
+              <div className="absolute top-3 right-3">
                 <button
                   onClick={() => handleHelpClick(model.id)}
-                  onMouseDown={() => handleHelpPress(model.id)}
-                  onMouseUp={handleHelpRelease}
-                  onMouseLeave={handleHelpRelease}
-                  onTouchStart={() => handleHelpPress(model.id)}
-                  onTouchEnd={handleHelpRelease}
-                  className="relative bg-white hover:bg-gray-50 rounded-full p-2 shadow-md border border-gray-200 transition-colors"
+                  className={`bg-gradient-to-r ${model.color} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95`}
                 >
-                  <HelpCircle className="w-5 h-5 text-gray-600" />
-
-                  {/* Tooltip */}
-                  {hoveredModel === model.id && (
-                    <div className="absolute top-full right-0 mt-2 bg-gray-900 text-white text-xs font-medium py-2 px-3 rounded-lg whitespace-nowrap z-10 shadow-xl">
-                      {model.name}とは？
-                      <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 transform rotate-45"></div>
-                    </div>
-                  )}
+                  もっと説明
                 </button>
               </div>
 

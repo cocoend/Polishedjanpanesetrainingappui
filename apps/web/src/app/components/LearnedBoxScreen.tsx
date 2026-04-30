@@ -13,6 +13,7 @@ interface LearnedBoxScreenProps {
 
 interface LearnedRecord {
   id: string;
+  cardId?: string;
   sessionId?: string;
   feedbackId?: string;
   topicTitle: string;
@@ -41,6 +42,7 @@ const modelLabelMap: Record<string, string> = {
 function mapLearnedCardToRecord(card: LearnedCardDto): LearnedRecord {
   return {
     id: card.id,
+    cardId: card.id,
     sessionId: card.sessionId,
     feedbackId: card.feedbackId,
     topicTitle: card.title,

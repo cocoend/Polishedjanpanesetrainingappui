@@ -1,4 +1,4 @@
-import { ArrowLeft, Target, Lightbulb, MessageSquare, BookOpen, Mic, CheckCircle2, ListOrdered, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Target, Lightbulb, MessageSquare, BookOpen, Mic, CheckCircle2, ListOrdered } from 'lucide-react';
 import { Topic } from './TopicSelectionScreen';
 import { useEffect, useState } from 'react';
 
@@ -40,6 +40,12 @@ const modelData: Record<string, {
     color: 'bg-purple-50 border-purple-200',
     iconComponent: Lightbulb
   }
+};
+
+const modelButtonColorMap: Record<string, string> = {
+  prep: 'from-green-400 to-emerald-500',
+  stepbystep: 'from-blue-400 to-blue-500',
+  scqa: 'from-purple-400 to-purple-500',
 };
 
 export default function TopicDetailScreen({ onNavigate, selectedModel, selectedTopic, onViewModelIntro }: TopicDetailScreenProps) {
@@ -114,33 +120,9 @@ export default function TopicDetailScreen({ onNavigate, selectedModel, selectedT
     steps: detailView.recommendedModel.steps,
   };
   const ModelIcon = currentModel.iconComponent;
-
-  const [showModelTooltip, setShowModelTooltip] = useState(false);
-  const [pressTimer, setPressTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleHelpPress = () => {
-    const timer = setTimeout(() => {
-      setShowModelTooltip(true);
-    }, 500);
-    setPressTimer(timer);
-  };
-
-  const handleHelpRelease = () => {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      setPressTimer(null);
-    }
-    setShowModelTooltip(false);
-  };
+  const currentModelButtonColor = modelButtonColorMap[currentModelId] ?? modelButtonColorMap.stepbystep;
 
   const handleHelpClick = () => {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      setPressTimer(null);
-    }
-    if (showModelTooltip) {
-      setShowModelTooltip(false);
-    }
     if (onViewModelIntro) {
       onViewModelIntro(currentModelId);
     }
@@ -189,25 +171,12 @@ export default function TopicDetailScreen({ onNavigate, selectedModel, selectedT
           {/* Help Button */}
           <button
             onClick={handleHelpClick}
-            onMouseDown={handleHelpPress}
-            onMouseUp={handleHelpRelease}
-            onMouseLeave={handleHelpRelease}
-            onTouchStart={handleHelpPress}
-            onTouchEnd={handleHelpRelease}
-            className="absolute top-3 right-3 bg-white hover:bg-gray-50 rounded-full p-2 shadow-md border border-gray-200 transition-colors"
+            className={`absolute top-2 right-2 bg-gradient-to-r ${currentModelButtonColor} text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95`}
           >
-            <HelpCircle className="w-4 h-4 text-gray-600" />
-
-            {/* Tooltip */}
-            {showModelTooltip && (
-              <div className="absolute top-full right-0 mt-2 bg-gray-900 text-white text-xs font-medium py-2 px-3 rounded-lg whitespace-nowrap z-10 shadow-xl">
-                {currentModel.name}とは？
-                <div className="absolute -top-1 right-3 w-2 h-2 bg-gray-900 transform rotate-45"></div>
-              </div>
-            )}
+            もっと説明
           </button>
 
-          <div className="flex items-center justify-between mb-3 pr-8">
+          <div className="flex items-center justify-between mb-3 pr-24">
             <div className="flex items-center gap-3">
               <div className={`${
                 currentModelId === 'prep' ? 'bg-green-500' :

@@ -116,7 +116,7 @@ export function mapThemeDetailResponseToViewModel(response: ThemeDetailResponseD
     keywords: response.theme.keywords,
     usefulExpressions: response.theme.usefulExpressions.map((expression) => ({
       title: expression,
-      subtitle: '练习时可以自然地放进说明里',
+      subtitle: '練習中に自然に使える表現',
     })),
     hints: response.theme.hints,
   };

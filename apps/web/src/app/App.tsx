@@ -16,6 +16,7 @@ import {
   createSession,
   getAttempt,
   getFeedback,
+  markLearnedCardAsRead,
   transcribeAttempt,
 } from './lib/api';
 
@@ -33,6 +34,7 @@ export default function App() {
   const [activeAttemptId, setActiveAttemptId] = useState<string | null>(null);
   const [latestTranscriptText, setLatestTranscriptText] = useState<string>('');
   const [activeFeedback, setActiveFeedback] = useState<FeedbackDto | null>(null);
+  const [homeRefreshKey, setHomeRefreshKey] = useState(0);
 
   const resumeSession = (input: {
     sessionId: string;
@@ -97,6 +99,7 @@ export default function App() {
             onSelectTopic={setSelectedTopic}
             onResumeSession={resumeSession}
             unreadLearnedBoxCount={unreadLearnedBoxCount}
+            refreshKey={homeRefreshKey}
           />
         )}
         {currentScreen === 'topic' && (
@@ -220,6 +223,12 @@ export default function App() {
             onSelectRecord={async (record) => {
               if (!record.feedbackId) {
                 return;
+              }
+
+              if (record.cardId) {
+                await markLearnedCardAsRead(record.cardId);
+                setUnreadLearnedBoxCount(0);
+                setHomeRefreshKey((current) => current + 1);
               }
 
               const feedback = await getFeedback(record.feedbackId);
