@@ -11,6 +11,7 @@ interface FeedbackScreenProps {
   activeAttemptId?: string | null;
   activeSessionId?: string | null;
   initialFeedback?: FeedbackDto | null;
+  backScreen?: string;
   onSaveToLearnedBox?: () => void;
 }
 
@@ -20,11 +21,13 @@ export default function FeedbackScreen({
   activeAttemptId,
   activeSessionId,
   initialFeedback,
+  backScreen = 'recording',
   onSaveToLearnedBox,
 }: FeedbackScreenProps) {
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const [isSaved, setIsSaved] = useState(false);
   const [feedback, setFeedback] = useState<FeedbackDto | null>(initialFeedback ?? null);
+  const isViewingSavedFeedback = backScreen === 'learnedBox';
 
   useEffect(() => {
     if (initialFeedback) {
@@ -57,7 +60,10 @@ export default function FeedbackScreen({
   }, [activeAttemptId, initialFeedback]);
 
   const toggleSection = (section: string) => {
-    setExpandedSection(expandedSection === section ? null : section);
+    setExpandedSections((current) => ({
+      ...current,
+      [section]: !current[section],
+    }));
   };
 
   const handleSaveToLearnedBox = () => {
@@ -67,10 +73,6 @@ export default function FeedbackScreen({
       if (onSaveToLearnedBox) {
         onSaveToLearnedBox();
       }
-
-      setTimeout(() => {
-        setIsSaved(false);
-      }, 2000);
     };
 
     if (!activeSessionId) {
@@ -93,7 +95,7 @@ export default function FeedbackScreen({
       <div className="min-h-screen bg-white pb-8">
         <div className="px-6 pt-12 pb-6 sticky top-0 bg-white z-10 border-b border-gray-100">
           <button
-            onClick={() => onNavigate('recording')}
+            onClick={() => onNavigate(backScreen)}
             className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -115,7 +117,7 @@ export default function FeedbackScreen({
       {/* Header */}
       <div className="px-6 pt-12 pb-6 sticky top-0 bg-white z-10 border-b border-gray-100">
         <button
-          onClick={() => onNavigate('recording')}
+          onClick={() => onNavigate(backScreen)}
           className="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -213,12 +215,12 @@ export default function FeedbackScreen({
             <h2 className="text-sm font-bold text-gray-900 uppercase">あなたの回答全文</h2>
             <ChevronDown
               className={`w-5 h-5 text-gray-500 transition-transform ${
-                expandedSection === 'transcript' ? 'rotate-180' : ''
+                expandedSections.transcript ? 'rotate-180' : ''
               }`}
             />
           </div>
         </button>
-        {expandedSection === 'transcript' && (
+        {expandedSections.transcript && (
           <div className="mt-3 bg-white border-2 border-gray-200 rounded-2xl p-5">
             <p className="text-gray-900 leading-relaxed">
               {latestTranscriptText || 'スマートフォンというのは、携帯電話の一つです。画面を指で触って操作することができます。例えば、インターネットで調べ物をしたり、友達とメッセージを送ったり、写真を撮ったりすることができます。'}
@@ -248,12 +250,12 @@ export default function FeedbackScreen({
             </div>
             <ChevronDown
               className={`w-5 h-5 text-gray-500 transition-transform ${
-                expandedSection === 'model' ? 'rotate-180' : ''
+                expandedSections.model ? 'rotate-180' : ''
               }`}
             />
           </div>
         </button>
-        {expandedSection === 'model' && (
+        {expandedSections.model && (
           <div className="mt-3 bg-white border-2 border-purple-200 rounded-2xl p-5">
             <p className="text-gray-900 leading-relaxed mb-4">
               {feedback.improvedAnswerExample}
@@ -298,19 +300,19 @@ export default function FeedbackScreen({
         <button
           onClick={handleSaveToLearnedBox}
           className={`w-full ${
-            isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-600'
+            isSaved || isViewingSavedFeedback ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-600'
           } text-white font-bold py-4 rounded-2xl shadow-md flex items-center justify-center gap-3 transition-colors`}
-          disabled={isSaved}
+          disabled={isSaved || isViewingSavedFeedback}
         >
-          {isSaved ? (
+          {isSaved || isViewingSavedFeedback ? (
             <>
               <CheckCircle2 className="w-5 h-5" />
-              保存しました！
+              保存できました！
             </>
           ) : (
             <>
               <BookOpen className="w-5 h-5" />
-              結果を保存して学んだBOXへ
+              学んだBOXに保存する
             </>
           )}
         </button>

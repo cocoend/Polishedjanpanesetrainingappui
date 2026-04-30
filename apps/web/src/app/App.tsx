@@ -9,7 +9,15 @@ import FeedbackScreen from './components/FeedbackScreen';
 import RetryScreen from './components/RetryScreen';
 import LearnedBoxScreen from './components/LearnedBoxScreen';
 import type { FeedbackDto } from '@polished/shared';
-import { createAttempt, createAttemptUpload, createFeedback, createSession, transcribeAttempt } from './lib/api';
+import {
+  createAttempt,
+  createAttemptUpload,
+  createFeedback,
+  createSession,
+  getAttempt,
+  getFeedback,
+  transcribeAttempt,
+} from './lib/api';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState('home');
@@ -195,6 +203,7 @@ export default function App() {
             activeAttemptId={activeAttemptId}
             activeSessionId={activeSessionId}
             initialFeedback={activeFeedback}
+            backScreen={previousScreen === 'learnedBox' ? 'learnedBox' : 'recording'}
             onSaveToLearnedBox={() => setUnreadLearnedBoxCount(prev => prev + 1)}
           />
         )}
@@ -208,6 +217,21 @@ export default function App() {
           <LearnedBoxScreen
             onNavigate={navigateToScreen}
             onMarkAsRead={() => setUnreadLearnedBoxCount(0)}
+            onSelectRecord={async (record) => {
+              if (!record.feedbackId) {
+                return;
+              }
+
+              const feedback = await getFeedback(record.feedbackId);
+              const attempt = await getAttempt(feedback.attemptId);
+
+              setActiveSessionId(record.sessionId ?? feedback.sessionId);
+              setActiveAttemptId(feedback.attemptId);
+              setLatestTranscriptText(attempt.transcriptText);
+              setActiveFeedback(feedback);
+              setPreviousScreen('learnedBox');
+              setCurrentScreen('feedback');
+            }}
           />
         )}
       </div>

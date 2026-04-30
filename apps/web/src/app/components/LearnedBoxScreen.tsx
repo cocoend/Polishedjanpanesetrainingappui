@@ -8,10 +8,13 @@ import { getLearnedCards } from '../lib/api';
 interface LearnedBoxScreenProps {
   onNavigate: (screen: string) => void;
   onMarkAsRead?: () => void;
+  onSelectRecord?: (record: LearnedRecord) => void | Promise<void>;
 }
 
 interface LearnedRecord {
   id: string;
+  sessionId?: string;
+  feedbackId?: string;
   topicTitle: string;
   level: string;
   badge: string;
@@ -38,6 +41,8 @@ const modelLabelMap: Record<string, string> = {
 function mapLearnedCardToRecord(card: LearnedCardDto): LearnedRecord {
   return {
     id: card.id,
+    sessionId: card.sessionId,
+    feedbackId: card.feedbackId,
     topicTitle: card.title,
     level: card.themeLevel,
     badge: levelBadgeMap[card.themeLevel] ?? levelBadgeMap.初級,
@@ -101,7 +106,7 @@ const learnedRecords: LearnedRecord[] = [
   }
 ];
 
-export default function LearnedBoxScreen({ onNavigate, onMarkAsRead }: LearnedBoxScreenProps) {
+export default function LearnedBoxScreen({ onNavigate, onMarkAsRead, onSelectRecord }: LearnedBoxScreenProps) {
   const [filter, setFilter] = useState<'all' | 'recent' | 'high'>('all');
   const [records, setRecords] = useState<LearnedRecord[] | null>(null);
 
@@ -236,7 +241,26 @@ export default function LearnedBoxScreen({ onNavigate, onMarkAsRead }: LearnedBo
         {filteredRecords.map((record) => (
           <div
             key={record.id}
-            className="bg-white border-2 border-gray-200 rounded-2xl p-5 hover:border-green-300 hover:shadow-md transition-all"
+            onClick={() => {
+              if (onSelectRecord && record.feedbackId) {
+                void onSelectRecord(record);
+              }
+            }}
+            role={record.feedbackId ? 'button' : undefined}
+            tabIndex={record.feedbackId ? 0 : undefined}
+            onKeyDown={(event) => {
+              if (!onSelectRecord || !record.feedbackId) {
+                return;
+              }
+
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                void onSelectRecord(record);
+              }
+            }}
+            className={`bg-white border-2 border-gray-200 rounded-2xl p-5 hover:border-green-300 hover:shadow-md transition-all ${
+              record.feedbackId ? 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2' : ''
+            }`}
           >
             {/* Header */}
             <div className="flex items-start justify-between mb-3">
@@ -284,7 +308,18 @@ export default function LearnedBoxScreen({ onNavigate, onMarkAsRead }: LearnedBo
               <div className="text-sm text-gray-600">
                 試行回数: <span className="font-semibold text-gray-900">{record.attempts}回</span>
               </div>
-              <button className="flex items-center gap-1 text-green-600 font-semibold text-sm hover:text-green-700">
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+
+                  if (onSelectRecord && record.feedbackId) {
+                    void onSelectRecord(record);
+                  }
+                }}
+                disabled={!record.feedbackId}
+                className="flex items-center gap-1 text-green-600 font-semibold text-sm hover:text-green-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+              >
                 詳細を見る
                 <ChevronRight className="w-4 h-4" />
               </button>
