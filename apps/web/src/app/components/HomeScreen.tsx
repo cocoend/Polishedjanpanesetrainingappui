@@ -69,7 +69,7 @@ export default function HomeScreen({
     unreadLearnedBoxCount,
     homeData?.unreadLearnedCardCount ?? 0,
   );
-  const streakDays = homeData?.streakDays ?? 7;
+  const streakDays = homeData?.streakDays ?? 0;
   const latestScore = homeData?.latestScore ?? 65;
   const weakPoints = homeData?.weakPoints?.length
     ? homeData.weakPoints.slice(0, 3)

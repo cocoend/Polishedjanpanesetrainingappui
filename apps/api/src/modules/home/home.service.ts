@@ -173,35 +173,37 @@ export class HomeService {
         attempts: await this.attemptStore.listAttemptsBySessionId(session.id),
       })),
     );
-    const activityDays = Array.from(
-      new Set(
-        sessionActivity
-          .filter(({ attempts }) => attempts.length > 0)
-          .map(({ session }) => session.updatedAt.slice(0, 10)),
+    const activityDaySet = new Set(
+      sessionActivity.flatMap(({ attempts }) =>
+        attempts.map((attempt) => this.toTokyoDateKey(attempt.submittedAt)),
       ),
-    ).sort((left, right) => (left > right ? -1 : 1));
+    );
+    const todayKey = this.toTokyoDateKey(new Date().toISOString());
 
-    if (activityDays.length === 0) {
+    if (!activityDaySet.has(todayKey)) {
       return 0;
     }
 
-    let streak = 1;
+    let streak = 0;
+    let cursor = todayKey;
 
-    for (let index = 1; index < activityDays.length; index += 1) {
-      const previousDay = new Date(`${activityDays[index - 1]}T00:00:00.000Z`);
-      const currentDay = new Date(`${activityDays[index]}T00:00:00.000Z`);
-      const diffDays = Math.round(
-        (previousDay.getTime() - currentDay.getTime()) / (1000 * 60 * 60 * 24),
-      );
-
-      if (diffDays === 1) {
-        streak += 1;
-      } else {
-        break;
-      }
+    while (activityDaySet.has(cursor)) {
+      streak += 1;
+      cursor = this.addDaysToDateKey(cursor, -1);
     }
 
     return streak;
+  }
+
+  private toTokyoDateKey(isoDate: string) {
+    const tokyoOffsetMs = 9 * 60 * 60 * 1000;
+    return new Date(new Date(isoDate).getTime() + tokyoOffsetMs).toISOString().slice(0, 10);
+  }
+
+  private addDaysToDateKey(dateKey: string, days: number) {
+    const date = new Date(`${dateKey}T00:00:00.000Z`);
+    date.setUTCDate(date.getUTCDate() + days);
+    return date.toISOString().slice(0, 10);
   }
 
   private computeContinueProgressPercent(
