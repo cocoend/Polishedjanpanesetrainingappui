@@ -12,3 +12,5 @@ uploads
 apps/*/dist
 apps/*/.vite
 prisma/dev.db
+xcuserdata/
+*.xcuserstate
