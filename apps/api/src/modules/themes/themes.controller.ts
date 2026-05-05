@@ -2,6 +2,7 @@ import { Controller, Get, NotFoundException, Param, Query } from '@nestjs/common
 import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import {
+  findExplanationModelByIdOrSlug,
   findThemeByIdOrSlug,
   getThemeList,
 } from '../master-data/master-data';
@@ -51,13 +52,7 @@ export class ThemesController {
     schema: {
       example: {
         theme: findThemeByIdOrSlug('describe-coffee'),
-        recommendedModel: {
-          id: 'model-stepbystep',
-          slug: 'stepbystep',
-          nameJa: 'ステップ解説法',
-          shortDescription: '按顺序一步一步说明过程。',
-          steps: ['第一段階', '第二段階', '第三段階', '完成'],
-        },
+        recommendedModel: findExplanationModelByIdOrSlug('stepbystep'),
       },
     },
   })
@@ -80,13 +75,7 @@ export class ThemesController {
 
     return {
       theme,
-      recommendedModel: {
-        id: recommendedModel.id,
-        slug: recommendedModel.slug,
-        nameJa: recommendedModel.nameJa,
-        shortDescription: recommendedModel.shortDescription,
-        steps: recommendedModel.steps,
-      },
+      recommendedModel,
     };
   }
 }

@@ -239,6 +239,21 @@ export class SessionStoreService {
     }
   }
 
+  deleteInMemorySessionsByAnonymousUserId(anonymousUserId: string) {
+    const sessionIds = this.listInMemorySessionsByAnonymousUserId(anonymousUserId).map(
+      (session) => session.id,
+    );
+
+    for (const sessionId of sessionIds) {
+      this.sessions.delete(sessionId);
+    }
+
+    return {
+      deletedSessions: sessionIds.length,
+      sessionIds,
+    };
+  }
+
   async attachLatestAttempt(
     sessionId: string,
     latestAttemptId: string,

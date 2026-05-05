@@ -20,6 +20,8 @@ import { SessionStoreService } from './sessions/session-store.service';
 import { SessionsController } from './sessions/sessions.controller';
 import { ThemesController } from './themes/themes.controller';
 import { TranscriptionService } from './transcription/transcription.service';
+import { UserDataController } from './user-data/user-data.controller';
+import { UserDataService } from './user-data/user-data.service';
 
 @Module({
   imports: [
@@ -41,6 +43,7 @@ import { TranscriptionService } from './transcription/transcription.service';
     FeedbackController,
     RetryController,
     LearnedCardsController,
+    UserDataController,
   ],
   providers: [
     SessionStoreService,
@@ -52,6 +55,7 @@ import { TranscriptionService } from './transcription/transcription.service';
     MasterDataService,
     PrismaService,
     TranscriptionService,
+    UserDataService,
   ],
 })
 export class AppModule {}

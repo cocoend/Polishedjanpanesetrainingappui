@@ -21,7 +21,14 @@ export interface StoredAttempt {
 
 const MAX_AUDIO_DURATION_SEC = 10 * 60;
 const MAX_AUDIO_FILE_SIZE_BYTES = 10 * 1024 * 1024;
-const ALLOWED_AUDIO_MIME_TYPES = new Set(['audio/webm', 'video/webm']);
+const ALLOWED_AUDIO_MIME_TYPES = new Set([
+  'audio/webm',
+  'video/webm',
+  'audio/mp4',
+  'audio/m4a',
+  'audio/aac',
+  'audio/x-m4a',
+]);
 
 @Injectable()
 export class AttemptStoreService {
@@ -150,6 +157,24 @@ export class AttemptStoreService {
     } catch {
       return this.listInMemoryAttemptsBySessionId(sessionId);
     }
+  }
+
+  deleteInMemoryAttemptsBySessionIds(sessionIds: string[]) {
+    const sessionIdSet = new Set(sessionIds);
+    const attempts = Array.from(this.attempts.values()).filter((attempt) =>
+      sessionIdSet.has(attempt.sessionId),
+    );
+
+    for (const attempt of attempts) {
+      this.attempts.delete(attempt.id);
+    }
+
+    return {
+      deletedAttempts: attempts.length,
+      audioStorageKeys: attempts
+        .map((attempt) => attempt.audioStorageKey)
+        .filter((key): key is string => Boolean(key)),
+    };
   }
 
   async getAttemptById(attemptId: string): Promise<StoredAttempt> {
@@ -319,7 +344,7 @@ export class AttemptStoreService {
     audioFileSizeBytes: number;
   }) {
     if (!this.isAllowedAudioMimeType(input.audioMimeType)) {
-      throw new BadRequestException('Only webm audio uploads are supported for now.');
+      throw new BadRequestException('Only webm, m4a, mp4, and aac audio uploads are supported for now.');
     }
 
     if (input.audioDurationSec < 0 || input.audioDurationSec > MAX_AUDIO_DURATION_SEC) {
@@ -337,11 +362,21 @@ export class AttemptStoreService {
   private getUploadFileExtension(originalName: string | undefined, mimeType: string) {
     const originalExtension = originalName?.split('.').pop()?.toLowerCase();
 
-    if (originalExtension === 'webm') {
+    if (originalExtension === 'webm' || originalExtension === 'm4a' || originalExtension === 'aac') {
       return originalExtension;
     }
 
-    if (this.isAllowedAudioMimeType(mimeType)) {
+    const normalizedMimeType = mimeType.split(';')[0]?.trim().toLowerCase();
+
+    if (normalizedMimeType === 'audio/mp4' || normalizedMimeType === 'audio/m4a' || normalizedMimeType === 'audio/x-m4a') {
+      return 'm4a';
+    }
+
+    if (normalizedMimeType === 'audio/aac') {
+      return 'aac';
+    }
+
+    if (normalizedMimeType === 'audio/webm' || normalizedMimeType === 'video/webm') {
       return 'webm';
     }
 

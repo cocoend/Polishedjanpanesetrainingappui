@@ -350,6 +350,21 @@ export class LearnedCardsService {
     };
   }
 
+  deleteInMemoryCardsByAnonymousUserId(anonymousUserId: string) {
+    const cards = Array.from(this.cardsById.values()).filter(
+      (card) => card.anonymousUserId === anonymousUserId,
+    );
+
+    for (const card of cards) {
+      this.cardsById.delete(card.id);
+      this.cardIdBySessionId.delete(card.sessionId);
+    }
+
+    return {
+      deletedLearnedCards: cards.length,
+    };
+  }
+
   private cacheCard(card: StoredLearnedCard) {
     this.cardsById.set(card.id, card);
     this.cardIdBySessionId.set(card.sessionId, card.id);

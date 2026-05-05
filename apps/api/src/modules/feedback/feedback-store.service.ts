@@ -199,6 +199,22 @@ export class FeedbackStoreService {
     return feedback;
   }
 
+  deleteInMemoryFeedbackBySessionIds(sessionIds: string[]) {
+    const sessionIdSet = new Set(sessionIds);
+    const feedbacks = Array.from(this.feedbackById.values()).filter((feedback) =>
+      sessionIdSet.has(feedback.sessionId),
+    );
+
+    for (const feedback of feedbacks) {
+      this.feedbackById.delete(feedback.id);
+      this.feedbackByAttemptId.delete(feedback.attemptId);
+    }
+
+    return {
+      deletedFeedback: feedbacks.length,
+    };
+  }
+
   async getOrGenerateFeedbackByAttemptId(attemptId: string) {
     const existing = this.feedbackByAttemptId.get(attemptId);
 
