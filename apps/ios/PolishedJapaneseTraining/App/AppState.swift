@@ -231,7 +231,7 @@ final class AppState: ObservableObject {
     func transcribeLatestRecording(audioFileURL: URL?, audioDurationSec: Int) async {
         guard let currentSession, let audioFileURL else {
             latestTranscript = ""
-            feedbackLoadingError = "Session or audio file is unavailable. Please record again."
+            feedbackLoadingError = "録音データを確認できませんでした。もう一度録音してください。"
             return
         }
 
@@ -259,7 +259,7 @@ final class AppState: ObservableObject {
     func generateFeedbackFromLatestRecording(audioFileURL: URL?, audioDurationSec: Int) async {
         guard let currentSession else {
             try? await Task.sleep(nanoseconds: 2_500_000_000)
-            feedbackLoadingError = "Session is unavailable. Static sample feedback is displayed."
+            feedbackLoadingError = "セッション情報を確認できませんでした。もう一度録音してください。"
             push(.feedback(source: .recording))
             return
         }
@@ -306,7 +306,7 @@ final class AppState: ObservableObject {
         } catch {
             currentAttempt = nil
             currentFeedback = nil
-            feedbackLoadingError = "Feedback API is unavailable. Static sample feedback is displayed."
+            feedbackLoadingError = "AIフィードバックの作成に失敗しました。API設定を確認してください。"
         }
 
         push(.feedback(source: .recording))
