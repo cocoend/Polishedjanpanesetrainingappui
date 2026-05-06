@@ -16,6 +16,7 @@
 		5386428C6167E6653F77F238 /* APIContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E00046EE20C9F676ADCEFFF /* APIContracts.swift */; };
 		5FE7FF625DE67EBA0CD7E63B /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92779040BBF38F4D213BC085 /* APIClient.swift */; };
 		6D1526D5F77A131851CC80BE /* RetryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1DAAFBF3625670E0D3BC071 /* RetryScreen.swift */; };
+		765E1BC0F2705C5924AB1E50 /* LoginRequiredScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F418551E02D66C81AB165C /* LoginRequiredScreen.swift */; };
 		7DBB96BF35621B839A3A7D79 /* LearnedBoxScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B177A0899E53C3CBB27AAB06 /* LearnedBoxScreen.swift */; };
 		7E9FFB8E8DFA0605071DC0AD /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44D9D81A887CA3BACABF2E92 /* RootView.swift */; };
 		86C815035A825AB878E3D6B2 /* ModelIntroScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FF3A983A57536B35D6C176 /* ModelIntroScreen.swift */; };
@@ -47,6 +48,7 @@
 		B0B2F27D2C72EE5B734B2D33 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		B177A0899E53C3CBB27AAB06 /* LearnedBoxScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnedBoxScreen.swift; sourceTree = "<group>"; };
 		B1DAAFBF3625670E0D3BC071 /* RetryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RetryScreen.swift; sourceTree = "<group>"; };
+		B6F418551E02D66C81AB165C /* LoginRequiredScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRequiredScreen.swift; sourceTree = "<group>"; };
 		B9999685BEEA16A0334BA0FC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		F7FF3A983A57536B35D6C176 /* ModelIntroScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelIntroScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -91,6 +93,7 @@
 				ACAB984AB658117ADBCCD2BB /* FeedbackScreen.swift */,
 				92F71EC2632B89760424A7A3 /* HomeScreen.swift */,
 				B177A0899E53C3CBB27AAB06 /* LearnedBoxScreen.swift */,
+				B6F418551E02D66C81AB165C /* LoginRequiredScreen.swift */,
 				F7FF3A983A57536B35D6C176 /* ModelIntroScreen.swift */,
 				72C54D5E586DF7516CBEF28E /* ModelListScreen.swift */,
 				A5A72CD23B0B7EF2896B034C /* RecordingScreen.swift */,
@@ -202,6 +205,7 @@
 				F2EB1932D68955F0F2F9630F /* FeedbackScreen.swift in Sources */,
 				187C149952CC8D3F5A8FD272 /* HomeScreen.swift in Sources */,
 				7DBB96BF35621B839A3A7D79 /* LearnedBoxScreen.swift in Sources */,
+				765E1BC0F2705C5924AB1E50 /* LoginRequiredScreen.swift in Sources */,
 				86C815035A825AB878E3D6B2 /* ModelIntroScreen.swift in Sources */,
 				AEDB5C41C468099F635ADD45 /* ModelListScreen.swift in Sources */,
 				AFFBC211E0ED1497ECBA7BFE /* PolishedJapaneseTrainingApp.swift in Sources */,

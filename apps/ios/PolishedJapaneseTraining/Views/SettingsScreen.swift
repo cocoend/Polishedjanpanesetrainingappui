@@ -60,11 +60,15 @@ struct SettingsScreen: View {
         settingsSection(title: "アカウント") {
             settingsButtonRow(
                 icon: "person.fill",
-                iconTint: .gray,
-                title: "ログインしていません",
-                subtitle: "ログイン機能は今後追加予定です",
-                trailingSystemName: "arrow.right.circle"
-            ) {}
+                iconTint: appState.isLoggedIn ? .green : .gray,
+                title: appState.isLoggedIn ? "ログイン済み" : "ログインしていません",
+                subtitle: appState.isLoggedIn ? "アカウント連携は今後追加予定です" : "ログインすると学習記録を保存できます",
+                trailingSystemName: appState.isLoggedIn ? "checkmark.circle.fill" : "arrow.right.circle"
+            ) {
+                if !appState.isLoggedIn {
+                    appState.requireLogin(for: .openLearnedBox)
+                }
+            }
         }
     }
 

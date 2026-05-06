@@ -26,6 +26,8 @@ struct RootView: View {
                         LearnedBoxScreen()
                     case .settings:
                         SettingsScreen()
+                    case .loginRequired(let action):
+                        LoginRequiredScreen(action: action)
                     }
                 }
         }

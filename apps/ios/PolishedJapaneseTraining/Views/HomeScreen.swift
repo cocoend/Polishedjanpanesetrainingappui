@@ -9,7 +9,11 @@ struct HomeScreen: View {
                 AppHeader(title: "おはよう!", subtitle: "今日も説明の練習を頑張ろう") {
                     HStack(spacing: 8) {
                         Button {
-                            appState.push(.learnedBox)
+                            if appState.isLoggedIn {
+                                appState.push(.learnedBox)
+                            } else {
+                                appState.requireLogin(for: .openLearnedBox)
+                            }
                         } label: {
                             ZStack(alignment: .topTrailing) {
                                 Image(systemName: "archivebox.fill")

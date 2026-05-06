@@ -86,7 +86,7 @@ App 支持两种身份：
 | onboarding | Onboarding 2 How It Works | `OnboardingHowItWorksScreen.swift` | 规划中 | 使用方式页 |
 | onboarding | Onboarding 3 Permission | `OnboardingPermissionScreen.swift` | 规划中 | 麦克风权限说明页 |
 | onboarding | Onboarding 4 Login | `OnboardingLoginScreen.swift` | 规划中 | 登录 / 游客模式选择页 |
-| 账号体系 | Login Required | `LoginRequiredSheet.swift` 或 `LoginRequiredScreen.swift` | 规划中 | 游客触发受限功能时拦截 |
+| 账号体系 | Login Required | `LoginRequiredSheet.swift` 或 `LoginRequiredScreen.swift` | 已实现 | 游客触发受限功能时拦截 |
 | 账号体系 | Settings | `SettingsScreen.swift` | 已实现 | 偏好、帮助、隐私设置页 |
 | 账号体系 | User Profile | `UserProfileScreen.swift` | 规划中 | 用户资料、绑定邮箱、登出等 |
 | 账号体系 | First Login Survey | 待定 | 规划中 | 首次登录后的学习目标/水平问卷 |

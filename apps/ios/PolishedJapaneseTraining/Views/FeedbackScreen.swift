@@ -307,6 +307,11 @@ struct FeedbackScreen: View {
     }
 
     private func saveToLearnedBox() {
+        guard appState.isLoggedIn else {
+            appState.requireLogin(for: .saveToLearnedBox)
+            return
+        }
+
         isSaving = true
         Task {
             await appState.saveLatestFeedbackToLearnedBox()

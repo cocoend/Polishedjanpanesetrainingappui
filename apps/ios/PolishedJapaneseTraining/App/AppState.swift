@@ -2,6 +2,8 @@ import Foundation
 
 @MainActor
 final class AppState: ObservableObject {
+    @Published var authStatus: AuthStatus = AppStorageState.authStatus
+    @Published var pendingProtectedAction: ProtectedAction?
     @Published var path: [AppRoute] = []
     @Published var selectedTopic = PracticeTopic.sample
     @Published var topics = PracticeTopic.samples
@@ -43,6 +45,42 @@ final class AppState: ObservableObject {
 
     func pop() {
         _ = path.popLast()
+    }
+
+    var isLoggedIn: Bool {
+        authStatus == .loggedIn
+    }
+
+    func requireLogin(for action: ProtectedAction) {
+        pendingProtectedAction = action
+        push(.loginRequired(action: action))
+    }
+
+    func continueAsGuest() {
+        pendingProtectedAction = nil
+        pop()
+    }
+
+    func enablePrototypeLogin() {
+        authStatus = .loggedIn
+        AppStorageState.authStatus = .loggedIn
+
+        let action = pendingProtectedAction
+        pendingProtectedAction = nil
+
+        // Remove the intercept screen before continuing the protected flow.
+        pop()
+
+        switch action {
+        case .openLearnedBox:
+            push(.learnedBox)
+        case .saveToLearnedBox:
+            Task {
+                await saveLatestFeedbackToLearnedBox()
+            }
+        case .deleteMyData, .none:
+            break
+        }
     }
 
     func openLearnedRecord(_ record: LearnedRecord) {
@@ -340,9 +378,35 @@ enum AppRoute: Hashable {
     case retry
     case learnedBox
     case settings
+    case loginRequired(action: ProtectedAction)
 }
 
 enum FeedbackSource: Hashable {
     case recording
     case learnedBox
+}
+
+enum AuthStatus: String {
+    case loggedIn = "logged_in"
+    case guest
+}
+
+enum ProtectedAction: Hashable {
+    case saveToLearnedBox
+    case openLearnedBox
+    case deleteMyData
+}
+
+private enum AppStorageState {
+    private static let authStatusKey = "polished.authStatus"
+
+    static var authStatus: AuthStatus {
+        get {
+            let rawValue = UserDefaults.standard.string(forKey: authStatusKey) ?? AuthStatus.guest.rawValue
+            return AuthStatus(rawValue: rawValue) ?? .guest
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: authStatusKey)
+        }
+    }
 }
