@@ -24,6 +24,8 @@ struct RootView: View {
                         RetryScreen()
                     case .learnedBox:
                         LearnedBoxScreen()
+                    case .settings:
+                        SettingsScreen()
                     }
                 }
         }

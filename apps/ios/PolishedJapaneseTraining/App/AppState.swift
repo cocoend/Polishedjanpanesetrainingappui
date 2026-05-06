@@ -339,6 +339,7 @@ enum AppRoute: Hashable {
     case feedback(source: FeedbackSource)
     case retry
     case learnedBox
+    case settings
 }
 
 enum FeedbackSource: Hashable {

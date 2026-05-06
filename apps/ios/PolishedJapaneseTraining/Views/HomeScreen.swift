@@ -7,26 +7,39 @@ struct HomeScreen: View {
         ScrollView {
             VStack(spacing: 20) {
                 AppHeader(title: "おはよう!", subtitle: "今日も説明の練習を頑張ろう") {
-                    Button {
-                        appState.push(.learnedBox)
-                    } label: {
-                        ZStack(alignment: .topTrailing) {
-                            Image(systemName: "archivebox.fill")
+                    HStack(spacing: 8) {
+                        Button {
+                            appState.push(.learnedBox)
+                        } label: {
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "archivebox.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.gray)
+                                    .frame(width: 48, height: 48)
+                                    .background(Color.gray.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+                                if appState.unreadLearnedRecordCount > 0 {
+                                    Text(appState.unreadLearnedRecordCount > 9 ? "9+" : "\(appState.unreadLearnedRecordCount)")
+                                        .font(.caption2.bold())
+                                        .foregroundStyle(.white)
+                                        .frame(width: 20, height: 20)
+                                        .background(.red, in: Circle())
+                                        .offset(x: 6, y: -6)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+
+                        Button {
+                            appState.push(.settings)
+                        } label: {
+                            Image(systemName: "gearshape.fill")
                                 .font(.title3)
                                 .foregroundStyle(.gray)
                                 .frame(width: 48, height: 48)
                                 .background(Color.gray.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
-                            if appState.unreadLearnedRecordCount > 0 {
-                                Text(appState.unreadLearnedRecordCount > 9 ? "9+" : "\(appState.unreadLearnedRecordCount)")
-                                    .font(.caption2.bold())
-                                    .foregroundStyle(.white)
-                                    .frame(width: 20, height: 20)
-                                    .background(.red, in: Circle())
-                                    .offset(x: 6, y: -6)
-                            }
                         }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
 
                 streakCard

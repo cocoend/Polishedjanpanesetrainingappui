@@ -45,7 +45,8 @@ This project currently contains a SwiftUI client for:
 - Retry
 - Learned Box
 
-See `../../docs/ios-navigation-flow.md` for the page list, navigation flow, and API connection order.
+See `../../docs/ios-page-design-spec.md` for the consolidated iOS page design document.
+Historical page docs remain in `../../docs/ios-navigation-flow.md` and `../../docs/ios-onboarding-settings-spec.md`.
 
 ## API Base URL
 

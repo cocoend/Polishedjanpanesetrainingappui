@@ -1,5 +1,8 @@
 # iOS Page List and Navigation Flow
 
+> 本文档中的页面内容已整合进 `docs/ios-page-design-spec.md`。
+> 如需查看当前完整 iOS 页面设计，请优先参考总文档。
+
 This document describes the first SwiftUI implementation target for the iOS app.
 
 ## Architecture Direction

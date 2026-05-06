@@ -18,6 +18,14 @@ final class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
         return String(format: "%d:%02d", minutes, seconds)
     }
 
+    static func microphonePermissionGranted() async -> Bool {
+        await withCheckedContinuation { continuation in
+            AVAudioApplication.requestRecordPermission { isAllowed in
+                continuation.resume(returning: isAllowed)
+            }
+        }
+    }
+
     func toggleRecording() async {
         if isRecording {
             stopRecording()
@@ -86,11 +94,7 @@ final class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
     }
 
     private func requestMicrophonePermission() async -> Bool {
-        await withCheckedContinuation { continuation in
-            AVAudioApplication.requestRecordPermission { isAllowed in
-                continuation.resume(returning: isAllowed)
-            }
-        }
+        await Self.microphonePermissionGranted()
     }
 
     private func makeRecordingURL() -> URL {
