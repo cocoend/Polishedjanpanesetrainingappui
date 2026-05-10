@@ -19,17 +19,18 @@ targets:
       - path: PolishedJapaneseTraining/App
       - path: PolishedJapaneseTraining/Models
       - path: PolishedJapaneseTraining/Networking
+      - path: PolishedJapaneseTraining/Resources
       - path: PolishedJapaneseTraining/Views
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.polished.japanesetraining
-        PRODUCT_NAME: PolishedJapaneseTraining
+        PRODUCT_NAME: Model Speak
         TARGETED_DEVICE_FAMILY: 1
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: ""
         GENERATE_INFOPLIST_FILE: YES
         APP_API_BASE_URL: "http://127.0.0.1:3001/api"
-        INFOPLIST_KEY_CFBundleDisplayName: Polished
+        INFOPLIST_KEY_CFBundleDisplayName: Model Speak
         INFOPLIST_KEY_APP_API_BASE_URL: "$(APP_API_BASE_URL)"
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait

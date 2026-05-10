@@ -21,6 +21,7 @@
 		7E9FFB8E8DFA0605071DC0AD /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44D9D81A887CA3BACABF2E92 /* RootView.swift */; };
 		86C815035A825AB878E3D6B2 /* ModelIntroScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7FF3A983A57536B35D6C176 /* ModelIntroScreen.swift */; };
 		972911755D9349CE1D631412 /* RecordingScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A72CD23B0B7EF2896B034C /* RecordingScreen.swift */; };
+		9EAE676D476B076A3FBC304C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 762BFB4BCD22081CA87441CC /* Assets.xcassets */; };
 		A529E38D61CE75B7E9FB18B0 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C5B42A8C39038E3C194C6F3 /* SettingsScreen.swift */; };
 		A613A8C6B44C55BF77D97FAA /* AppModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2788EBFBD12834B300B2B1 /* AppModels.swift */; };
 		AEDB5C41C468099F635ADD45 /* ModelListScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C54D5E586DF7516CBEF28E /* ModelListScreen.swift */; };
@@ -37,8 +38,9 @@
 		4E0AF0E0DE091482CD1109C5 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		5E00046EE20C9F676ADCEFFF /* APIContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIContracts.swift; sourceTree = "<group>"; };
 		616D2E4C15A0EA5C183D4DB6 /* TopicSelectionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicSelectionScreen.swift; sourceTree = "<group>"; };
-		7282904EB3A2244691F771D1 /* PolishedJapaneseTraining.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PolishedJapaneseTraining.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7282904EB3A2244691F771D1 /* Model Speak.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Model Speak.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		72C54D5E586DF7516CBEF28E /* ModelListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelListScreen.swift; sourceTree = "<group>"; };
+		762BFB4BCD22081CA87441CC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7B2788EBFBD12834B300B2B1 /* AppModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModels.swift; sourceTree = "<group>"; };
 		92779040BBF38F4D213BC085 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		92F71EC2632B89760424A7A3 /* HomeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeScreen.swift; sourceTree = "<group>"; };
@@ -49,7 +51,7 @@
 		B177A0899E53C3CBB27AAB06 /* LearnedBoxScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnedBoxScreen.swift; sourceTree = "<group>"; };
 		B1DAAFBF3625670E0D3BC071 /* RetryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RetryScreen.swift; sourceTree = "<group>"; };
 		B6F418551E02D66C81AB165C /* LoginRequiredScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginRequiredScreen.swift; sourceTree = "<group>"; };
-		B9999685BEEA16A0334BA0FC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		B9999685BEEA16A0334BA0FC /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		F7FF3A983A57536B35D6C176 /* ModelIntroScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelIntroScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,6 +88,15 @@
 			path = PolishedJapaneseTraining/App;
 			sourceTree = "<group>";
 		};
+		72531BF754ED00F788CECE55 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				762BFB4BCD22081CA87441CC /* Assets.xcassets */,
+			);
+			name = Resources;
+			path = PolishedJapaneseTraining/Resources;
+			sourceTree = "<group>";
+		};
 		7E8D273FFB6BB64FA40DE01C /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -112,6 +123,7 @@
 				71728C7740BEA6CA3F8C24AA /* App */,
 				2B8FDC92DE08C8FDE4389B75 /* Models */,
 				025ABD230B36FB688258FAA1 /* Networking */,
+				72531BF754ED00F788CECE55 /* Resources */,
 				7E8D273FFB6BB64FA40DE01C /* Views */,
 				E14D279C895D6C095A043841 /* Products */,
 			);
@@ -120,7 +132,7 @@
 		E14D279C895D6C095A043841 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7282904EB3A2244691F771D1 /* PolishedJapaneseTraining.app */,
+				7282904EB3A2244691F771D1 /* Model Speak.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -143,7 +155,7 @@
 			packageProductDependencies = (
 			);
 			productName = PolishedJapaneseTraining;
-			productReference = 7282904EB3A2244691F771D1 /* PolishedJapaneseTraining.app */;
+			productReference = 7282904EB3A2244691F771D1 /* Model Speak.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -156,7 +168,6 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					95931A26CF61156AC222EC60 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -185,6 +196,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9EAE676D476B076A3FBC304C /* Assets.xcassets in Resources */,
 				5329F164ED7C0FB9B75D63E7 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -228,10 +240,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K93QGZSTV6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_APP_API_BASE_URL = "$(APP_API_BASE_URL)";
-				INFOPLIST_KEY_CFBundleDisplayName = Polished;
+				INFOPLIST_KEY_CFBundleDisplayName = "Model Speak";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "録音した音声を文字起こしし、AIフィードバックを作成するためにマイクを使用します。";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
@@ -241,7 +253,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.polished.japanesetraining;
-				PRODUCT_NAME = PolishedJapaneseTraining;
+				PRODUCT_NAME = "Model Speak";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
@@ -377,10 +389,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = K93QGZSTV6;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_APP_API_BASE_URL = "$(APP_API_BASE_URL)";
-				INFOPLIST_KEY_CFBundleDisplayName = Polished;
+				INFOPLIST_KEY_CFBundleDisplayName = "Model Speak";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "録音した音声を文字起こしし、AIフィードバックを作成するためにマイクを使用します。";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
@@ -390,7 +402,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.polished.japanesetraining;
-				PRODUCT_NAME = PolishedJapaneseTraining;
+				PRODUCT_NAME = "Model Speak";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
